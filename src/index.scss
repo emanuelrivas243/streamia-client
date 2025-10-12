@@ -1,5 +1,4 @@
-@import "tailwindcss";
-
-body {
-  @apply bg-gray-100 text-gray-900;
-}
+@import './styles/variables';
+@import './styles/mixins';
+@import './styles/globals';
+@import './layaout/layout';

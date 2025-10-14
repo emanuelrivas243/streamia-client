@@ -20,7 +20,7 @@ interface AuthContextType {
   clearError: () => void;
   setSuccessMessage: (msg: string | null) => void;
   updateProfile: (userData: Partial<RegisterData>) => Promise<boolean>;
-  deleteAccount: () => Promise<boolean>;
+  deleteAccount: (password: string) => Promise<boolean>;
 }
 
 /**
@@ -172,7 +172,8 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       const response = await authAPI.updateProfile(token, userData);
       
       if (response.success && response.data) {
-        setUser(response.data);
+        const updatedUser = (response.data as any).user ?? response.data;
+        setUser(updatedUser);
         return true;
       } else {
         setError(response.error || 'Profile update failed');
@@ -190,36 +191,40 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   /**
    * Delete user account
    */
-  const deleteAccount = async (): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
+  /**
+ * Delete user account
+ */
+const deleteAccount = async (password: string): Promise<boolean> => { // ← Agrega password como parámetro
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      const token = apiUtils.getToken();
-      if (!token) {
-        setError('No authentication token found');
-        return false;
-      }
-
-      const response = await authAPI.deleteAccount(token);
-      
-      if (response.success) {
-        // Clear local state
-        apiUtils.removeToken();
-        setUser(null);
-        return true;
-      } else {
-        setError(response.error || 'Account deletion failed');
-        return false;
-      }
-    } catch (err) {
-      console.error('Delete account error:', err);
-      setError('Network error occurred');
+  try {
+    const token = apiUtils.getToken();
+    if (!token) {
+      setError('No authentication token found');
       return false;
-    } finally {
-      setIsLoading(false);
     }
-  };
+
+    const response = await authAPI.deleteAccount(token, password); // ← Envía la contraseña
+    
+    if (response.success) {
+      // Clear local state
+      apiUtils.removeToken();
+      setUser(null);
+      setSuccessMessage('Cuenta eliminada correctamente');
+      return true;
+    } else {
+      setError(response.error || 'Account deletion failed');
+      return false;
+    }
+  } catch (err) {
+    console.error('Delete account error:', err);
+    setError('Network error occurred');
+    return false;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   /**
    * Initialize authentication state on app load

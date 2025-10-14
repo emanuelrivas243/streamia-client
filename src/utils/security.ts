@@ -1,6 +1,8 @@
 /**
- * Security utilities for STREAMIA application
- * Handles password validation, encryption, and security checks
+ * Security utilities for the STREAMIA application.
+ *
+ * Provides helpers to validate password strength, validate email and age,
+ * and other small security-oriented validations used across the client.
  */
 
 /**
@@ -52,7 +54,11 @@ export interface AgeValidationResult {
 }
 
 /**
- * Validate password strength
+ * Validate password strength according to the provided requirements.
+ *
+ * @param password - The password string to evaluate
+ * @param requirements - Optional rules to validate against (uses defaults)
+ * @returns PasswordValidationResult containing isValid, score (0-100), errors and suggestions
  */
 export function validatePassword(
   password: string,
@@ -136,7 +142,18 @@ export function validatePassword(
 }
 
 /**
- * Validate email format and security
+ * Validate password strength according to the provided requirements.
+ *
+ * @param password - The password string to evaluate
+ * @param requirements - Optional rules to validate against (uses defaults)
+ * @returns PasswordValidationResult containing isValid, score (0-100), errors and suggestions
+ */
+
+/**
+ * Validate email format and perform basic security checks.
+ *
+ * @param email - Email string to validate
+ * @returns EmailValidationResult with isValid and errors array
  */
 export function validateEmail(email: string): EmailValidationResult {
   const errors: string[] = [];
@@ -182,7 +199,13 @@ export function validateEmail(email: string): EmailValidationResult {
 }
 
 /**
- * Validate age
+ * Validate an age value.
+ *
+ * Accepts either a number or numeric string. Ensures value is within
+ * reasonable bounds for registration.
+ *
+ * @param age - Age number or numeric string
+ * @returns AgeValidationResult with isValid and errors
  */
 export function validateAge(age: number | string): AgeValidationResult {
   const errors: string[] = [];
@@ -208,7 +231,11 @@ export function validateAge(age: number | string): AgeValidationResult {
 }
 
 /**
- * Validate name fields
+ * Validate a name field (first name, last name, etc.).
+ *
+ * @param name - The name string to validate
+ * @param fieldName - Human-friendly field label used in error messages
+ * @returns object with isValid boolean and errors array
  */
 export function validateName(name: string, fieldName: string): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
@@ -243,7 +270,13 @@ export function validateName(name: string, fieldName: string): { isValid: boolea
 }
 
 /**
- * Sanitize input to prevent XSS
+ * Sanitize an input string to remove simple XSS vectors.
+ *
+ * NOTE: This is a lightweight sanitizer intended for client-side
+ * defensive measures. For server-side sanitization use a proven library.
+ *
+ * @param input - Raw user input
+ * @returns sanitized string
  */
 export function sanitizeInput(input: string): string {
   return input
@@ -254,7 +287,10 @@ export function sanitizeInput(input: string): string {
 }
 
 /**
- * Generate password strength indicator text
+ * Generate a localized text label for a numeric password strength score.
+ *
+ * @param score - Numeric strength score (0-100)
+ * @returns human-readable strength label
  */
 export function getPasswordStrengthText(score: number): string {
   if (score >= 80) return 'Muy fuerte';
@@ -265,7 +301,10 @@ export function getPasswordStrengthText(score: number): string {
 }
 
 /**
- * Generate password strength color
+ * Map a password strength numeric score to a color hex code.
+ *
+ * @param score - Numeric strength score (0-100)
+ * @returns hex color string suitable for UI indicators
  */
 export function getPasswordStrengthColor(score: number): string {
   if (score >= 80) return '#4CAF50'; // Green

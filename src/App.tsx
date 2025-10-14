@@ -1,3 +1,8 @@
+/**
+ * Root application component for STREAMIA client.
+ *
+ * Composes the top-level providers and layout for the app.
+ */
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/authContext';

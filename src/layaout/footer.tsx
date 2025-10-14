@@ -1,3 +1,8 @@
+/**
+ * Footer component displayed at the bottom of every page.
+ *
+ * Contains site links, social icons and copyright information.
+ */
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ROUTES } from '../routes/routes';

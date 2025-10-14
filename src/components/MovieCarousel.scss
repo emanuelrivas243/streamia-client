@@ -1,0 +1,54 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.movie-carousel {
+  padding: 1.5rem 0 2rem;
+  background: $background-dark;
+  overflow: hidden;
+
+  @include mobile {
+    padding: 1rem 0 1.5rem;
+  }
+
+  &__title {
+    color: $text-primary;
+    margin-bottom: 1.5rem;
+    text-align: left;
+    font-size: 1.3rem;
+    font-weight: $font-weight-bold;
+
+    @include mobile {
+      font-size: 1.1rem;
+      text-align: center;
+    }
+  }
+
+  &__wrapper {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 1rem 0;
+    scroll-behavior: smooth;
+    scrollbar-width: thin;
+    scrollbar-color: $primary-color transparent;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $primary-color;
+      border-radius: 3px;
+    }
+
+    @include mobile {
+      gap: 0.75rem;
+      padding: 0.5rem 0;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+}

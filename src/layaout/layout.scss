@@ -1,0 +1,59 @@
+@import '../styles/variables';
+@import '../styles/mixins';
+
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: $background-dark;
+
+  &__main {
+    flex: 1;
+    padding-top: 80px; // Account for fixed navbar
+    min-height: calc(100vh - 80px);
+  }
+}
+
+// Global styles for the layout
+body {
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-primary;
+  background: $background-dark;
+  color: $text-primary;
+  line-height: 1.6;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $background-dark;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $primary-color;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: lighten($primary-color, 10%);
+}
+
+// Focus styles for accessibility
+*:focus {
+  outline: 2px solid $primary-color;
+  outline-offset: 2px;
+}
+
+// Selection styles
+::selection {
+  background: $primary-color;
+  color: $text-primary;
+}

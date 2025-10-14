@@ -1,0 +1,25 @@
+/**
+ * Application routes constants
+ * Centralized route definitions for better maintainability
+ */
+export const ROUTES = {
+  // Public Routes
+  HOME: '/',
+  ABOUT: '/about',
+  LOGIN: '/login',
+  REGISTER: '/register',
+  RECOVER_PASSWORD: '/recover-password',
+  
+  // Protected Routes
+  EDIT_PROFILE: '/edit-profile',
+  
+  // Future routes can be added here
+  // DASHBOARD: '/dashboard',
+  // MOVIES: '/movies',
+  // PROFILE: '/profile',
+} as const;
+
+/**
+ * Route types for TypeScript
+ */
+export type RouteType = typeof ROUTES[keyof typeof ROUTES];

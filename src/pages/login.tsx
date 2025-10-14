@@ -57,8 +57,8 @@ export default function Login() {
     const success = await login({ email, password });
     
     if (success) {
-      // Redirect to home page on successful login
-      navigate("/");
+      // Redirect to Home Movies on successful login and replace history
+      navigate('/home-movies', { replace: true });
     }
   };
 

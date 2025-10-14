@@ -24,6 +24,7 @@ interface ApiResponse<T = any> {
   data?: T;
   message?: string;
   error?: string;
+  status?: number;
 }
 
 /**
@@ -88,9 +89,23 @@ async function makeRequest<T>(
     const data = await response.json();
 
     if (!response.ok) {
+      // Map some common HTTP status codes to friendly messages
+      let errorMsg = data?.message || `HTTP Error: ${response.status}`;
+      if (response.status === 409) {
+        // Conflict - usually used when resource (like email) already exists
+        errorMsg = 'El correo ya está registrado';
+      } else if (response.status === 401) {
+        // Unauthorized - invalid credentials
+        errorMsg = 'Correo o contraseña incorrectos';
+      } else if (response.status === 400) {
+        // Bad Request - validation or malformed data
+        errorMsg = data?.message || 'Solicitud inválida';
+      }
+
       return {
         success: false,
-        error: data.message || `HTTP Error: ${response.status}`,
+        status: response.status,
+        error: errorMsg,
       };
     }
 

@@ -37,7 +37,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Check if user is authenticated
    */
-  const isAuthenticated = !!user && apiUtils.isAuthenticated();
+  // Consider authenticated if a valid token exists; user is fetched lazily
+  const isAuthenticated = apiUtils.isAuthenticated();
 
   /**
    * Clear error state

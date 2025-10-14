@@ -13,13 +13,12 @@
   &__title {
     color: $text-primary;
     margin-bottom: 1.5rem;
-    text-align: left;
+    text-align: center;
     font-size: 1.3rem;
     font-weight: $font-weight-bold;
 
     @include mobile {
       font-size: 1.1rem;
-      text-align: center;
     }
   }
 
@@ -28,6 +27,7 @@
     gap: 1rem;
     overflow-x: auto;
     padding: 1rem 0;
+    justify-content: center; // center content to avoid right bias on wide screens
     scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: $primary-color transparent;

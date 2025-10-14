@@ -1,3 +1,8 @@
+/**
+ * Generic Button component used across STREAMIA UI.
+ *
+ * Small stylized wrapper around a native button element.
+ */
 import React from 'react';
 import './Button.scss';
 

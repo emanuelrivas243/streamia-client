@@ -8,9 +8,14 @@
   .static-hero {
     position: relative;
     height: 360px;
-    background: radial-gradient( circle at 20% 20%, rgba(255,0,0,0.12), transparent 40% ),
-                radial-gradient( circle at 80% 30%, rgba(255,0,0,0.08), transparent 45% ),
-                #0f0f0f;
+   background-image:
+      url('/images/landingpageimage.jpg'),
+      url('../assets/landingpageimage.jpg'),
+      url('/landingpageimage.jpg'),
+      url('https://images.unsplash.com/photo-1489599808417-8a0a4b2b8b8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+    background-size: cover, cover, cover;
+    background-position: center 53%, center top, center top;
+    background-repeat: no-repeat, no-repeat, no-repeat;
 
     @include mobile { height: 220px; }
 
@@ -106,7 +111,6 @@
 .static-page--contact .static-content p strong { color: #f1f1f1; }
 
 // Page specific accents
-.about-page .static-hero { background-image: radial-gradient(circle at 10% 10%, rgba(255,0,0,.15), transparent 40%), radial-gradient(circle at 80% 10%, rgba(255,0,0,.06), transparent 45%), #0f0f0f; }
 .contact-page .static-hero { background-image: radial-gradient(circle at 20% 20%, rgba(255,70,70,.15), transparent 40%), radial-gradient(circle at 70% 0%, rgba(255,70,70,.06), transparent 45%), #0f0f0f; }
 .sitemap-page .static-hero { background-image: radial-gradient(circle at 30% 15%, rgba(255,0,0,.12), transparent 40%), radial-gradient(circle at 90% 10%, rgba(255,0,0,.05), transparent 45%), #0f0f0f; }
 

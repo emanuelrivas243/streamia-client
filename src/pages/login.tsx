@@ -1,5 +1,10 @@
+/**
+ * Login page component.
+ *
+ * Renders the login form and handles user authentication.
+ */
 import React, { useState } from "react";
-import { ArrowLeft, Mail, Lock } from "lucide-react";
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import "../styles/login.scss";
@@ -11,6 +16,7 @@ import "../styles/login.scss";
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   
   const { login, isLoading, error, clearError } = useAuth();
@@ -146,10 +152,10 @@ export default function Login() {
 
               {/* Contraseña */}
               <div className="input-group">
-                <div className="input-container">
+                <div className="input-container has-toggle">
                   <Lock className="input-icon" size={20} />
                   <input
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Contraseña"
                     value={password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
@@ -158,6 +164,14 @@ export default function Login() {
                     aria-describedby={validationErrors.password ? "password-error" : undefined}
                     aria-invalid={!!validationErrors.password}
                   />
+                  <button
+                    type="button"
+                    className="password-toggle"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
                 </div>
                 {validationErrors.password && (
                   <span id="password-error" className="field-error" role="alert">

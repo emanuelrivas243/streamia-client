@@ -2,7 +2,7 @@
  * Authentication Context for STREAMIA application
  * Manages user authentication state and provides auth methods
  */
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, useMemo } from 'react';
 import { authAPI, apiUtils, User, LoginCredentials, RegisterData } from '../services/api';
 
 /**
@@ -13,12 +13,14 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  successMessage: string | null;
   login: (credentials: LoginCredentials) => Promise<boolean>;
   register: (userData: RegisterData) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
+  setSuccessMessage: (msg: string | null) => void;
   updateProfile: (userData: Partial<RegisterData>) => Promise<boolean>;
-  deleteAccount: () => Promise<boolean>;
+  deleteAccount: (password: string) => Promise<boolean>;
 }
 
 /**
@@ -29,24 +31,38 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /**
  * Authentication provider component
  */
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated.
+   *
+   * This helper reads the stored token state via `apiUtils.isAuthenticated()`
+   * and returns a boolean indicating whether a token is present.
    */
   // Consider authenticated if a valid token exists; user is fetched lazily
   const isAuthenticated = apiUtils.isAuthenticated();
 
   /**
-   * Clear error state
+   * Clear error state.
+   *
+   * Resets the `error` field in context to null.
    */
   const clearError = () => setError(null);
 
   /**
-   * Login user with credentials
+   * Login the user with credentials.
+   *
+   * Attempts to authenticate using `authAPI.login`. On success saves the
+   * returned token via `apiUtils.saveToken`, updates `user` state and sets
+   * a `successMessage`. On failure sets the `error` state. Returns true when
+   * login was successful.
+   *
+   * @param credentials - The user's login credentials (email/password)
+   * @returns Promise<boolean> - true if login succeeded
    */
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     setIsLoading(true);
@@ -60,12 +76,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);
+        setSuccessMessage('Inicio de sesión exitoso');
         return true;
       } else {
         setError(response.error || 'Login failed');
         return false;
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -74,10 +92,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   /**
-   * Register new user
+   * Register a new user and sign them in.
+   *
+   * Calls `authAPI.register` and on success stores the returned token and
+   * user, and sets a `successMessage`. Errors populate the `error` state.
+   *
+   * @param userData - Registration payload (name, email, password, ...)
+   * @returns Promise<boolean> - true if registration succeeded
    */
   const register = async (userData: RegisterData): Promise<boolean> => {
     setIsLoading(true);
+          setSuccessMessage('Inicio de sesión exitoso');
     setError(null);
 
     try {
@@ -87,12 +112,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);
+        setSuccessMessage('Registro exitoso');
         return true;
       } else {
         setError(response.error || 'Registration failed');
         return false;
       }
     } catch (err) {
+      console.error('Register error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -101,9 +128,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   /**
-   * Logout user
+   * Logout the current user.
+   *
+   * Attempts to notify the backend via `authAPI.logout`. Regardless of API
+   * response it clears stored token and user state locally. Does not throw on
+   * failure but logs the error.
+   *
+   * @returns Promise<void>
    */
   const logout = async (): Promise<void> => {
+          setSuccessMessage('Cierre de sesión exitoso');
     setIsLoading(true);
     
     try {
@@ -138,13 +172,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authAPI.updateProfile(token, userData);
       
       if (response.success && response.data) {
-        setUser(response.data);
+        const updatedUser = (response.data as any).user ?? response.data;
+        setUser(updatedUser);
         return true;
       } else {
         setError(response.error || 'Profile update failed');
         return false;
       }
     } catch (err) {
+      console.error('Update profile error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -155,35 +191,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /**
    * Delete user account
    */
-  const deleteAccount = async (): Promise<boolean> => {
-    setIsLoading(true);
-    setError(null);
+  /**
+ * Delete user account
+ */
+const deleteAccount = async (password: string): Promise<boolean> => { // ← Agrega password como parámetro
+  setIsLoading(true);
+  setError(null);
 
-    try {
-      const token = apiUtils.getToken();
-      if (!token) {
-        setError('No authentication token found');
-        return false;
-      }
-
-      const response = await authAPI.deleteAccount(token);
-      
-      if (response.success) {
-        // Clear local state
-        apiUtils.removeToken();
-        setUser(null);
-        return true;
-      } else {
-        setError(response.error || 'Account deletion failed');
-        return false;
-      }
-    } catch (err) {
-      setError('Network error occurred');
+  try {
+    const token = apiUtils.getToken();
+    if (!token) {
+      setError('No authentication token found');
       return false;
-    } finally {
-      setIsLoading(false);
     }
-  };
+
+    const response = await authAPI.deleteAccount(token, password); // ← Envía la contraseña
+    
+    if (response.success) {
+      // Clear local state
+      apiUtils.removeToken();
+      setUser(null);
+      setSuccessMessage('Cuenta eliminada correctamente');
+      return true;
+    } else {
+      setError(response.error || 'Account deletion failed');
+      return false;
+    }
+  } catch (err) {
+    console.error('Delete account error:', err);
+    setError('Network error occurred');
+    return false;
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   /**
    * Initialize authentication state on app load
@@ -213,18 +254,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
   }, []);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated,
     isLoading,
     error,
+    successMessage,
     login,
     register,
     logout,
     clearError,
+    setSuccessMessage,
     updateProfile,
     deleteAccount,
-  };
+  }), [user, isAuthenticated, isLoading, error, successMessage, login, register, logout, clearError, setSuccessMessage, updateProfile, deleteAccount]);
 
   return (
     <AuthContext.Provider value={value}>

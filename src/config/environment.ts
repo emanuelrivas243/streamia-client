@@ -1,5 +1,8 @@
+
 /**
- * Environment configuration for STREAMIA
+ * Environment configuration for the STREAMIA client.
+ *
+ * Centralizes base API URLs, endpoint helpers and application constants.
  */
 
 export const API_BASE_URL =

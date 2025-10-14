@@ -31,13 +31,18 @@ export default function Register() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState({ score: 0, text: "", color: "" });
   
   const { register, isLoading, error, clearError } = useAuth();
   const navigate = useNavigate();
 
   /**
-   * Handle input changes with sanitization
+   * Handle input change events for the registration form.
+   *
+   * Sanitizes the input value, updates the `formData` state, clears any
+   * validation error for the field, and performs a live password-strength
+   * check when the password field changes.
+   *
+   * @param e - Change event from an input element
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -57,20 +62,16 @@ export default function Register() {
         [name]: ""
       }));
     }
-
-    // Real-time password strength check
-    if (name === "password") {
-      const validation = validatePassword(sanitizedValue, DEFAULT_PASSWORD_REQUIREMENTS);
-      setPasswordStrength({
-        score: validation.score,
-        text: getPasswordStrengthText(validation.score),
-        color: getPasswordStrengthColor(validation.score)
-      });
-    }
   };
 
   /**
-   * Validate all form fields
+   * Validate all form fields and populate `validationErrors`.
+   *
+   * Uses the shared security utilities to verify name, age, email and
+   * password constraints. If validation fails, the first error per field
+   * is stored in `validationErrors`.
+   *
+   * @returns boolean - true when the form is valid
    */
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
@@ -115,7 +116,13 @@ export default function Register() {
   };
 
   /**
-   * Handle form submission
+   * Handle the registration form submission.
+   *
+   * Prevents default form behavior, clears previous errors, validates the
+   * input and calls `register` from AuthContext. On success navigates to
+   * the home page.
+   *
+   * @param e - Form submit event
    */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -149,7 +156,10 @@ export default function Register() {
   };
 
   /**
-   * Handle cancel button click
+   * Cancel registration and navigate back to the home page.
+   *
+   * This is triggered by the Back/Cancel button and simply uses react-router
+   * navigation to return to `/`.
    */
   const handleCancel = () => {
     navigate("/");

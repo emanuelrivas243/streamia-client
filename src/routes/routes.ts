@@ -1,6 +1,7 @@
 /**
- * Application routes constants
- * Centralized route definitions for better maintainability
+ * Application routes constants (STREAMIA client).
+ *
+ * Centralized route definitions to keep route paths consistent across the app.
  */
 export const ROUTES = {
   // Public Routes

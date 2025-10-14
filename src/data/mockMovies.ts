@@ -73,7 +73,7 @@ export const mockMovies: Movie[] = [
   },
   {
     id: 7,
-    title: "Elio Movie",
+    title: "Elio",
     imageUrl: "/images/eliomovie.jpg",
     category: "Suspense",
     year: 2023,

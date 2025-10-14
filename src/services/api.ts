@@ -61,12 +61,22 @@ export interface RegisterData {
 }
 
 /**
+ * Change password interface
+ */
+export interface ChangePasswordData {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/**
  * Login response interface
  */
 export interface LoginResponse {
   user: User;
   token: string;
 }
+
+
 
 /**
  * Generic HTTP request function
@@ -94,6 +104,13 @@ async function makeRequest<T>(
       headers,
     });
 
+    if (response.status === 204) {
+      return {
+        success: true,
+        data: {} as T
+      };
+    }
+
     const data = await response.json();
 
     if (!response.ok) {
@@ -106,7 +123,7 @@ async function makeRequest<T>(
         // Unauthorized - token invalid or credentials wrong
         // Remove token locally to force re-authentication
         apiUtils.removeToken();
-        errorMsg = 'Correo o contraseña incorrectos';
+        errorMsg = 'Sesión expirada. Inicia sesión de nuevo';
       } else if (response.status === 400) {
         // Bad Request - validation or malformed data
         errorMsg = data?.message || 'Solicitud inválida';
@@ -135,6 +152,8 @@ async function makeRequest<T>(
  * Authentication API functions
  */
 export const authAPI = {
+
+
   /**
    * Login user with email and password
    */
@@ -171,7 +190,7 @@ export const authAPI = {
    * Request password recovery
    */
   async recoverPassword(email: string): Promise<ApiResponse> {
-    return makeRequest('/api/users/recover-password', {
+    return makeRequest('/api/users/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
@@ -181,7 +200,7 @@ export const authAPI = {
    * Get current user profile
    */
   async getProfile(token: string): Promise<ApiResponse<User>> {
-    return makeRequest<User>('/api/users/profile', {
+    return makeRequest<User>('/api/users/me', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -196,7 +215,7 @@ export const authAPI = {
     token: string, 
     userData: Partial<RegisterData>
   ): Promise<ApiResponse<User>> {
-    return makeRequest<User>('/api/users/profile', {
+    return makeRequest<User>('/api/users/me', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -208,12 +227,14 @@ export const authAPI = {
   /**
    * Delete user account
    */
-  async deleteAccount(token: string): Promise<ApiResponse> {
-    return makeRequest('/api/users/account', {
+  async deleteAccount(token: string, password: string): Promise<ApiResponse> {
+    return makeRequest('/api/users/me', {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
+      body: JSON.stringify({ password }),
     });
   },
 };
@@ -279,3 +300,4 @@ export const apiUtils = {
     return !!this.getToken();
   },
 };
+

@@ -9,7 +9,7 @@ import EditProfile from '../pages/editProfile';
 const ProtectedRoutes: React.FC = () => {
   return (
     <Routes>
-      <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path="" element={<EditProfile />} />
       {/* Add more protected routes here as needed */}
     </Routes>
   );

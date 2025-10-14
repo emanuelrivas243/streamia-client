@@ -37,10 +37,10 @@ const Footer: React.FC = () => {
           <Link to={ROUTES.ABOUT} className="footer__link">
             Acerca de nosotros
           </Link>
-          <Link to="/sitemap" className="footer__link">
+          <Link to={ROUTES.SITEMAP} className="footer__link">
             Mapa del sitio
           </Link>
-          <Link to="/contact" className="footer__link">
+          <Link to={ROUTES.CONTACT} className="footer__link">
             Contacto
           </Link>
         </div>

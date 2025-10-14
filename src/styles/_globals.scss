@@ -103,6 +103,9 @@ img {
   @include container;
 }
 
+// optional background image overrides for static pages
+// .static-page .static-hero { background-image: url('/images/your-hero.jpg'); }
+
 .text-center {
   text-align: center;
 }

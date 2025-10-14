@@ -78,12 +78,20 @@ async function makeRequest<T>(
   try {
     const url = `${API_BASE_URL}${endpoint}`;
     
+    // Include Authorization header automatically when token is present
+    const token = apiUtils.getToken();
+    const headers = {
+      'Content-Type': 'application/json',
+      ...config.headers,
+    } as Record<string, string>;
+
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
     const response = await fetch(url, {
       ...config,
-      headers: {
-        'Content-Type': 'application/json',
-        ...config.headers,
-      },
+      headers,
     });
 
     const data = await response.json();
@@ -95,8 +103,10 @@ async function makeRequest<T>(
         // Conflict - usually used when resource (like email) already exists
         errorMsg = 'El correo ya está registrado';
       } else if (response.status === 401) {
-        // Unauthorized - invalid credentials
-        errorMsg = 'Correo o contraseña incorrectos';
+        // Unauthorized - token invalid or credentials wrong
+        // Remove token locally to force re-authentication
+        apiUtils.removeToken();
+        errorMsg = 'Sesión expirada. Inicia sesión de nuevo';
       } else if (response.status === 400) {
         // Bad Request - validation or malformed data
         errorMsg = data?.message || 'Solicitud inválida';

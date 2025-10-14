@@ -7,6 +7,7 @@ import Register from '../pages/register';
 import HomeMovies from '../pages/home-movies';
 import RecoverPassword from '../pages/recoverPassword';
 import ProtectedRoutes from './protectedRoutes';
+import ProtectedRoute from '../components/ProtectedRoute';
 
 /**
  * Public application routes configuration
@@ -25,7 +26,11 @@ const AppRouters: React.FC = () => {
 
       
       {/* Protected Routes */}
-      <Route path="/edit-profile" element={<ProtectedRoutes />} />
+      <Route path="/edit-profile" element={
+        <ProtectedRoute>
+          <ProtectedRoutes />
+        </ProtectedRoute>
+      } />
     </Routes>
   );
 };

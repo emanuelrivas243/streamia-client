@@ -55,6 +55,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authAPI.login(credentials);
       
       if (response.success && response.data) {
+        console.log("Token recibido del backend:", response.data.token);
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);

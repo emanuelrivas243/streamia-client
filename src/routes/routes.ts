@@ -12,6 +12,7 @@ export const ROUTES = {
   LOGIN: '/login',
   REGISTER: '/register',
   RECOVER_PASSWORD: '/recover-password',
+  RESET_PASSWORD: '/reset-password',
   
   // Protected Routes
   EDIT_PROFILE: '/edit-profile',

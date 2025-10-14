@@ -230,6 +230,20 @@ export const authAPI = {
   },
 
   /**
+   * Reset password with token.
+   *
+   * @param token - Reset token from email
+   * @param newPassword - New password to set
+   * @returns ApiResponse
+   */
+  async resetPassword(token: string, newPassword: string): Promise<ApiResponse> {
+    return makeRequest('/api/users/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
+  /**
    * Get the current user's profile using the provided token.
    *
    * @param token - Authentication token

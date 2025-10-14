@@ -1,4 +1,7 @@
 import React, { useState } from 'react'
+/**
+ * Navigation bar component used on top of all pages.
+ */
 import { Link, useNavigate } from 'react-router-dom'
 import { ROUTES } from '../routes/routes'
 import { useAuth } from '../context/authContext'

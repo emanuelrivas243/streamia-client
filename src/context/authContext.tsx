@@ -38,18 +38,31 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   /**
-   * Check if user is authenticated
+   * Check if user is authenticated.
+   *
+   * This helper reads the stored token state via `apiUtils.isAuthenticated()`
+   * and returns a boolean indicating whether a token is present.
    */
   // Consider authenticated if a valid token exists; user is fetched lazily
   const isAuthenticated = apiUtils.isAuthenticated();
 
   /**
-   * Clear error state
+   * Clear error state.
+   *
+   * Resets the `error` field in context to null.
    */
   const clearError = () => setError(null);
 
   /**
-   * Login user with credentials
+   * Login the user with credentials.
+   *
+   * Attempts to authenticate using `authAPI.login`. On success saves the
+   * returned token via `apiUtils.saveToken`, updates `user` state and sets
+   * a `successMessage`. On failure sets the `error` state. Returns true when
+   * login was successful.
+   *
+   * @param credentials - The user's login credentials (email/password)
+   * @returns Promise<boolean> - true if login succeeded
    */
   const login = async (credentials: LoginCredentials): Promise<boolean> => {
     setIsLoading(true);
@@ -79,7 +92,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   };
 
   /**
-   * Register new user
+   * Register a new user and sign them in.
+   *
+   * Calls `authAPI.register` and on success stores the returned token and
+   * user, and sets a `successMessage`. Errors populate the `error` state.
+   *
+   * @param userData - Registration payload (name, email, password, ...)
+   * @returns Promise<boolean> - true if registration succeeded
    */
   const register = async (userData: RegisterData): Promise<boolean> => {
     setIsLoading(true);
@@ -109,7 +128,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   };
 
   /**
-   * Logout user
+   * Logout the current user.
+   *
+   * Attempts to notify the backend via `authAPI.logout`. Regardless of API
+   * response it clears stored token and user state locally. Does not throw on
+   * failure but logs the error.
+   *
+   * @returns Promise<void>
    */
   const logout = async (): Promise<void> => {
           setSuccessMessage('Cierre de sesión exitoso');

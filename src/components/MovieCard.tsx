@@ -1,3 +1,6 @@
+/**
+ * MovieCard component displays a single movie tile with metadata and actions.
+ */
 import React from 'react';
 import './MovieCard.scss';
 

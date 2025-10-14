@@ -1,3 +1,6 @@
+/**
+ * MovieCarousel component renders a horizontal scrolling list of MovieCard items.
+ */
 import React from 'react';
 import MovieCard from './MovieCard';
 import './MovieCarousel.scss';

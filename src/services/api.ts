@@ -2,6 +2,18 @@
  * API Service for STREAMIA application
  * Handles all HTTP requests to the backend using Fetch API
  */
+/**
+ * API Service for STREAMIA application
+ * Handles all HTTP requests to the backend using Fetch API
+ */
+ 
+/**
+ * API utilities and typed wrapper for HTTP requests used by the STREAMIA client.
+ *
+ * This module exports helper functions that handle token management, a
+ * makeRequest wrapper around fetch, and domain-specific API functions
+ * (auth, movies, etc.). Responses are normalized to ApiResponse<T>.
+ */
 import { config } from '../config/environment';
 
 // Base URL from configuration
@@ -69,7 +81,16 @@ export interface LoginResponse {
 }
 
 /**
- * Generic HTTP request function
+ * Generic HTTP request function.
+ *
+ * Wraps fetch and automatically attaches JSON headers and Authorization
+ * when a token is available via `apiUtils.getToken()`. Normalizes responses
+ * into ApiResponse<T> objects and maps some common HTTP status codes to
+ * friendly error messages.
+ *
+ * @param endpoint - Path appended to the API base URL (e.g. '/users/login')
+ * @param config - Request configuration: method, headers and optional body
+ * @returns ApiResponse<T> - Normalized response with success/data or error
  */
 async function makeRequest<T>(
   endpoint: string, 
@@ -131,12 +152,15 @@ async function makeRequest<T>(
   }
 }
 
-/**
- * Authentication API functions
- */
+  /**
+   * Authentication API functions
+   */
 export const authAPI = {
   /**
-   * Login user with email and password
+   * Login user with email and password.
+   *
+   * @param credentials - Object containing email and password
+   * @returns ApiResponse<LoginResponse>
    */
   async login(credentials: LoginCredentials): Promise<ApiResponse<LoginResponse>> {
     return makeRequest<LoginResponse>('/api/users/login', {
@@ -146,7 +170,10 @@ export const authAPI = {
   },
 
   /**
-   * Register new user
+   * Register new user and return authentication payload.
+   *
+   * @param userData - Registration payload
+   * @returns ApiResponse<LoginResponse>
    */
   async register(userData: RegisterData): Promise<ApiResponse<LoginResponse>> {
     return makeRequest<LoginResponse>('/api/users/register', {
@@ -156,7 +183,10 @@ export const authAPI = {
   },
 
   /**
-   * Logout user
+   * Logout user on the server side.
+   *
+   * @param token - Current authentication token
+   * @returns ApiResponse
    */
   async logout(token: string): Promise<ApiResponse> {
     return makeRequest('/api/users/logout', {
@@ -168,7 +198,10 @@ export const authAPI = {
   },
 
   /**
-   * Request password recovery
+   * Request password recovery email for the given address.
+   *
+   * @param email - User email to send recovery instructions to
+   * @returns ApiResponse
    */
   async recoverPassword(email: string): Promise<ApiResponse> {
     return makeRequest('/api/users/recover-password', {
@@ -178,7 +211,10 @@ export const authAPI = {
   },
 
   /**
-   * Get current user profile
+   * Get the current user's profile using the provided token.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse<User>
    */
   async getProfile(token: string): Promise<ApiResponse<User>> {
     return makeRequest<User>('/api/users/profile', {
@@ -190,7 +226,11 @@ export const authAPI = {
   },
 
   /**
-   * Update user profile
+   * Update the user's profile.
+   *
+   * @param token - Authentication token
+   * @param userData - Partial profile fields to update
+   * @returns ApiResponse<User>
    */
   async updateProfile(
     token: string, 
@@ -206,7 +246,10 @@ export const authAPI = {
   },
 
   /**
-   * Delete user account
+   * Delete the authenticated user's account.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse
    */
   async deleteAccount(token: string): Promise<ApiResponse> {
     return makeRequest('/api/users/account', {
@@ -219,11 +262,14 @@ export const authAPI = {
 };
 
 /**
- * Movies API functions (for future implementation)
+ * Movies API functions (for future implementation).
  */
 export const moviesAPI = {
   /**
-   * Get all movies
+   * Get all movies from the API.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse<any[]>
    */
   async getMovies(token: string): Promise<ApiResponse<any[]>> {
     return makeRequest<any[]>('/movies', {
@@ -235,7 +281,11 @@ export const moviesAPI = {
   },
 
   /**
-   * Get movie by ID
+   * Get a single movie by its id.
+   *
+   * @param token - Authentication token
+   * @param movieId - ID of the movie
+   * @returns ApiResponse<any>
    */
   async getMovieById(token: string, movieId: string): Promise<ApiResponse<any>> {
     return makeRequest<any>(`/movies/${movieId}`, {
@@ -248,32 +298,34 @@ export const moviesAPI = {
 };
 
 /**
- * Utility functions
+ * Utility functions for token management and simple auth helpers.
  */
 export const apiUtils = {
   /**
-   * Get token from localStorage
+   * Get the saved authentication token from localStorage.
+   * @returns token string or null when not present
    */
   getToken(): string | null {
     return localStorage.getItem('streamia_token');
   },
 
   /**
-   * Save token to localStorage
+   * Save an authentication token to localStorage.
+   * @param token - Token string to save
    */
   saveToken(token: string): void {
     localStorage.setItem('streamia_token', token);
   },
 
   /**
-   * Remove token from localStorage
+   * Remove the authentication token from localStorage.
    */
   removeToken(): void {
     localStorage.removeItem('streamia_token');
   },
 
   /**
-   * Check if user is authenticated
+   * Return whether a token exists in storage (proxy for authenticated state).
    */
   isAuthenticated(): boolean {
     return !!this.getToken();

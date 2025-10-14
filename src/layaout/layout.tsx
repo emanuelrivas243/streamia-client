@@ -1,3 +1,8 @@
+/**
+ * Application layout component.
+ *
+ * Wraps page content with navigation, footer and renders global toasts.
+ */
 import React, { useEffect } from 'react';
 import NavBar from './navBar';
 import Footer from './footer';

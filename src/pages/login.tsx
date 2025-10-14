@@ -1,3 +1,8 @@
+/**
+ * Login page component.
+ *
+ * Renders the login form and handles user authentication.
+ */
 import React, { useState } from "react";
 import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";

@@ -1,3 +1,8 @@
+/**
+ * Vite configuration for the STREAMIA client application.
+ *
+ * This file exports the Vite configuration used during development and build.
+ */
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 

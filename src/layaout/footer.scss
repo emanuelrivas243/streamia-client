@@ -7,9 +7,9 @@
   margin-top: auto;
 
   &__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 1.25rem; // edge gutters
     display: flex;
     justify-content: space-between;
     align-items: flex-start;

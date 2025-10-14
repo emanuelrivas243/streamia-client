@@ -13,9 +13,9 @@
   transition: all 0.3s ease;
 
   &__container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
+    max-width: 100%;
+    margin: 0;
+    padding: 0 1.25rem; // gutters to keep content off the very edge
     display: flex;
     justify-content: flex-start;
     align-items: center;

@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { Play, Heart, SlidersHorizontal, Star } from 'lucide-react';
 import Button from '../components/Button';
+import MovieCard from '../components/MovieCard';
+import { mockMovies } from '../data/mockMovies';
 import './home-movies.scss';
 
 /**
@@ -9,6 +11,9 @@ import './home-movies.scss';
  */
 const HomeMovies: React.FC = () => {
   const [rating, setRating] = useState<number>(4); // default mocked rating
+  const [selectedMovieIndex, setSelectedMovieIndex] = useState<number>(2); // default to Demon Slayer (id 3)
+
+  const selectedMovie = mockMovies[selectedMovieIndex] ?? mockMovies[0];
 
   const handleRate = (value: number) => {
     setRating(value);
@@ -18,15 +23,17 @@ const HomeMovies: React.FC = () => {
     <div className="home-movies">
       <div className="home-movies__hero">
         {/* Poster */}
-        <div className="home-movies__poster" aria-label="Movie poster placeholder" />
+        <div
+          className="home-movies__poster"
+          aria-label={`Póster de ${selectedMovie.title}`}
+          style={{ backgroundImage: `url(${selectedMovie.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+        />
 
         {/* Details */}
         <div className="home-movies__details">
-          <h1 className="home-movies__title">Demon Slayer</h1>
+          <h1 className="home-movies__title">{selectedMovie.title}</h1>
           <p className="home-movies__description">
-            El Cuerpo de Cazadores de Demonios es arrastrado al laberíntico Castillo del Infinito, la fortaleza de Muzan. 
-            Una vez dentro, se separan y deben enfrentarse a demonios de alto rango en batallas brutales e individuales. 
-            Muzan busca destruir a los cazadores de una vez por todas, mientras ellos luchan contra los poderosos demonios restantes.
+            {selectedMovie.description}
           </p>
 
           {/* Actions */}
@@ -72,8 +79,14 @@ const HomeMovies: React.FC = () => {
       <section className="home-movies__more">
         <h2 className="home-movies__section-title">Más como esto</h2>
         <div className="home-movies__grid">
-          {Array.from({ length: 6 }).map((_, idx) => (
-            <div key={idx} className="home-movies__placeholder" aria-label="Placeholder de película" />
+          {mockMovies.slice(0, 6).map((movie, idx) => (
+            <MovieCard
+              key={movie.id}
+              id={movie.id}
+              title={movie.title}
+              imageUrl={movie.imageUrl}
+              onClick={() => setSelectedMovieIndex(idx)}
+            />
           ))}
         </div>
       </section>

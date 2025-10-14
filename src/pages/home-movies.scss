@@ -8,8 +8,8 @@
     grid-template-columns: 340px 1fr;
     gap: 32px;
     align-items: start;
-    max-width: 1100px;
-    margin: 0 auto 40px;
+    max-width: 100%;
+    margin: 0 0 40px;
     background: linear-gradient(180deg, rgba(38,17,8,0.8), rgba(15,15,15,0.6));
     padding: 24px;
     border-radius: 8px;
@@ -94,8 +94,8 @@
   }
 
   &__more {
-    max-width: 1100px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
   }
 
   &__section-title {
@@ -106,8 +106,9 @@
 
   &__grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 16px;
+    align-items: start;
   }
 
   &__placeholder {
@@ -123,7 +124,7 @@
       grid-template-columns: 260px 1fr;
     }
     &__title { font-size: 42px; }
-    &__grid { grid-template-columns: repeat(5, 1fr); }
+    &__grid { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
   }
 
   @media (max-width: 768px) {
@@ -132,11 +133,11 @@
       grid-template-columns: 1fr;
     }
     &__poster { max-width: 420px; justify-self: center; }
-    &__grid { grid-template-columns: repeat(3, 1fr); }
+    &__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
   }
 
   @media (max-width: 480px) {
-    &__grid { grid-template-columns: repeat(2, 1fr); }
+    &__grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
     &__title { font-size: 34px; }
   }
 }

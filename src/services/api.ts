@@ -106,7 +106,7 @@ async function makeRequest<T>(
         // Unauthorized - token invalid or credentials wrong
         // Remove token locally to force re-authentication
         apiUtils.removeToken();
-        errorMsg = 'Sesión expirada. Inicia sesión de nuevo';
+        errorMsg = 'Correo o contraseña incorrectos';
       } else if (response.status === 400) {
         // Bad Request - validation or malformed data
         errorMsg = data?.message || 'Solicitud inválida';

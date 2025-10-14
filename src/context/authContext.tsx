@@ -2,7 +2,7 @@
  * Authentication Context for STREAMIA application
  * Manages user authentication state and provides auth methods
  */
-import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode, useMemo } from 'react';
 import { authAPI, apiUtils, User, LoginCredentials, RegisterData } from '../services/api';
 
 /**
@@ -13,10 +13,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  successMessage: string | null;
   login: (credentials: LoginCredentials) => Promise<boolean>;
   register: (userData: RegisterData) => Promise<boolean>;
   logout: () => Promise<void>;
   clearError: () => void;
+  setSuccessMessage: (msg: string | null) => void;
   updateProfile: (userData: Partial<RegisterData>) => Promise<boolean>;
   deleteAccount: () => Promise<boolean>;
 }
@@ -29,10 +31,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 /**
  * Authentication provider component
  */
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   /**
    * Check if user is authenticated
@@ -60,12 +63,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);
+        setSuccessMessage('Inicio de sesión exitoso');
         return true;
       } else {
         setError(response.error || 'Login failed');
         return false;
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -78,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    */
   const register = async (userData: RegisterData): Promise<boolean> => {
     setIsLoading(true);
+          setSuccessMessage('Inicio de sesión exitoso');
     setError(null);
 
     try {
@@ -87,12 +93,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);
+        setSuccessMessage('Registro exitoso');
         return true;
       } else {
         setError(response.error || 'Registration failed');
         return false;
       }
     } catch (err) {
+      console.error('Register error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -104,6 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
    * Logout user
    */
   const logout = async (): Promise<void> => {
+          setSuccessMessage('Cierre de sesión exitoso');
     setIsLoading(true);
     
     try {
@@ -145,6 +154,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
     } catch (err) {
+      console.error('Update profile error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -178,6 +188,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return false;
       }
     } catch (err) {
+      console.error('Delete account error:', err);
       setError('Network error occurred');
       return false;
     } finally {
@@ -213,18 +224,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     initializeAuth();
   }, []);
 
-  const value: AuthContextType = {
+  const value: AuthContextType = useMemo(() => ({
     user,
     isAuthenticated,
     isLoading,
     error,
+    successMessage,
     login,
     register,
     logout,
     clearError,
+    setSuccessMessage,
     updateProfile,
     deleteAccount,
-  };
+  }), [user, isAuthenticated, isLoading, error, successMessage, login, register, logout, clearError, setSuccessMessage, updateProfile, deleteAccount]);
 
   return (
     <AuthContext.Provider value={value}>

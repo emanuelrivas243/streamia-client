@@ -113,7 +113,7 @@ export const authAPI = {
    * Login user with email and password
    */
   async login(credentials: LoginCredentials): Promise<ApiResponse<LoginResponse>> {
-    return makeRequest<LoginResponse>('/auth/login', {
+    return makeRequest<LoginResponse>('/api/users/login', {
       method: 'POST',
       body: JSON.stringify(credentials),
     });
@@ -123,7 +123,7 @@ export const authAPI = {
    * Register new user
    */
   async register(userData: RegisterData): Promise<ApiResponse<LoginResponse>> {
-    return makeRequest<LoginResponse>('/auth/register', {
+    return makeRequest<LoginResponse>('/api/users/register', {
       method: 'POST',
       body: JSON.stringify(userData),
     });
@@ -133,7 +133,7 @@ export const authAPI = {
    * Logout user
    */
   async logout(token: string): Promise<ApiResponse> {
-    return makeRequest('/auth/logout', {
+    return makeRequest('/api/users/logout', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -145,7 +145,7 @@ export const authAPI = {
    * Request password recovery
    */
   async recoverPassword(email: string): Promise<ApiResponse> {
-    return makeRequest('/auth/recover-password', {
+    return makeRequest('/api/users/recover-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     });
@@ -155,7 +155,7 @@ export const authAPI = {
    * Get current user profile
    */
   async getProfile(token: string): Promise<ApiResponse<User>> {
-    return makeRequest<User>('/auth/profile', {
+    return makeRequest<User>('/api/users/profile', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -170,7 +170,7 @@ export const authAPI = {
     token: string, 
     userData: Partial<RegisterData>
   ): Promise<ApiResponse<User>> {
-    return makeRequest<User>('/auth/profile', {
+    return makeRequest<User>('/api/users/profile', {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -183,7 +183,7 @@ export const authAPI = {
    * Delete user account
    */
   async deleteAccount(token: string): Promise<ApiResponse> {
-    return makeRequest('/auth/account', {
+    return makeRequest('/api/users/account', {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,

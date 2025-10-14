@@ -1,11 +1,15 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
-  css: {
-    postcss: {
-      plugins: []
-    }
-  }
-})
+  server: {
+    proxy: {
+      '/api': {
+        target: 'https://streamia-server.onrender.com',
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});

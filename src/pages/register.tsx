@@ -131,11 +131,12 @@ export default function Register() {
 
     // Prepare registration data
     const registrationData = {
-      nombre: formData.nombre.trim(),
-      apellido: formData.apellido.trim(),
-      edad: parseInt(formData.edad, 10),
+      firstName: formData.nombre.trim(),
+      lastName: formData.apellido.trim(),
+      age: parseInt(formData.edad, 10),
       email: formData.email.trim().toLowerCase(),
-      password: formData.password
+      password: formData.password,
+      confirmPassword: formData.confirmPassword
     };
 
     // Attempt registration

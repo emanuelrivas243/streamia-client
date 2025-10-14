@@ -31,9 +31,9 @@ interface ApiResponse<T = any> {
  */
 export interface User {
   id: string;
-  nombre: string;
-  apellido: string;
-  edad: number;
+  firstName: string;
+  lastName: string;
+  age: number;
   email: string;
   createdAt: string;
   updatedAt: string;
@@ -51,11 +51,12 @@ export interface LoginCredentials {
  * Register data interface
  */
 export interface RegisterData {
-  nombre: string;
-  apellido: string;
-  edad: number;
+  firstName: string;
+  lastName: string;
+  age: number;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 /**

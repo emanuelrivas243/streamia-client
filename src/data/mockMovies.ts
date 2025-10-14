@@ -10,6 +10,7 @@ export interface Movie {
   category: string;
   year: number;
   rating: number;
+  description?: string;
 }
 
 /**
@@ -19,57 +20,64 @@ export const mockMovies: Movie[] = [
   {
     id: 1,
     title: "John Wick 4",
-    imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    imageUrl: "/images/jhonwhick.jpg",
     category: "Acción",
     year: 2023,
-    rating: 8.5
+    rating: 8.5,
+    description: "John Wick libra una guerra total contra el Alto Consejo, enfrentando nuevos enemigos y alianzas en una batalla imparable."
   },
   {
     id: 2,
-    title: "One Battle After Another",
-    imageUrl: "https://images.unsplash.com/photo-1489599808417-8a0a4b2b8b8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    title: "Batman",
+    imageUrl: "/images/batman.jpg",
     category: "Drama",
     year: 2023,
-    rating: 7.8
+    rating: 7.8,
+    description: "Batman investiga una red de corrupción en Gotham mientras se enfrenta a un enigmático asesino serial."
   },
   {
     id: 3,
     title: "Demon Slayer",
-    imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    imageUrl: "/images/demonslayer.jpg",
     category: "Anime",
     year: 2023,
-    rating: 9.2
+    rating: 9.2,
+    description: "Los cazadores de demonios son arrastrados al Castillo del Infinito para afrontar batallas definitivas contra demonios de alto rango."
   },
   {
     id: 4,
     title: "K-Pop Demon Hunters",
-    imageUrl: "https://images.unsplash.com/photo-1489599808417-8a0a4b2b8b8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    imageUrl: "/images/kpopdemonhunters.jpg",
     category: "Comedia",
     year: 2023,
-    rating: 7.5
+    rating: 7.5,
+    description: "Un grupo de idols K‑Pop dobla como cazadoras de demonios, equilibrando escenarios y peligros sobrenaturales."
   },
   {
     id: 5,
     title: "Weapons",
-    imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    imageUrl: "/images/waapons.jpg",
     category: "Thriller",
     year: 2023,
-    rating: 8.0
+    rating: 8.0,
+    description: "Un thriller que entrelaza historias oscuras alrededor de un misterioso accidente y sus consecuencias."
   },
   {
     id: 6,
-    title: "Dead Poets Society",
-    imageUrl: "https://images.unsplash.com/photo-1489599808417-8a0a4b2b8b8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    title: "Wicked",
+    imageUrl: "/images/wicked.avif",
     category: "Drama",
     year: 1989,
-    rating: 8.9
+    rating: 8.9,
+    description: "La historia no contada de las brujas de Oz, donde amistad y destino chocan en un mundo de magia."
   },
   {
     id: 7,
-    title: "Bring Her Back",
-    imageUrl: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?ixlib=rb-4.0.3&auto=format&fit=crop&w=500&q=80",
+    title: "Elio Movie",
+    imageUrl: "/images/eliomovie.jpg",
     category: "Suspense",
     year: 2023,
-    rating: 7.2
+    rating: 7.2,
+    description: "Elio es transportado accidentalmente a una asamblea intergaláctica y debe representar a la Tierra."
   }
 ];

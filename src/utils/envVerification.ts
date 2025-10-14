@@ -3,6 +3,8 @@
  * Use this to check if your .env variables are being read correctly
  */
 
+// this file is not used but im afraid to delete it 
+
 import { config } from './environment';
 
 /**

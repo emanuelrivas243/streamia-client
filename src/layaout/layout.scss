@@ -57,3 +57,32 @@ body {
   background: $primary-color;
   color: $text-primary;
 }
+
+/* Global toast for success messages */
+.global-toast {
+  background: rgba(16, 185, 129, 0.95); // green-500
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(2,6,23,0.6);
+  z-index: 9999;
+  font-weight: 600;
+}
+.global-toast--success {
+  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+/* Error variant */
+.global-toast--error {
+  background: linear-gradient(90deg, #ef4444 0%, #dc2626 100%); // red shades
+}
+
+/* Wrapper to position toasts at top-center without affecting layout flow */
+.global-toast-wrapper {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none; /* allow clicks through unless made interactive */
+}

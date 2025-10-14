@@ -8,6 +8,7 @@ import Login from '../pages/login';
 import Register from '../pages/register';
 import HomeMovies from '../pages/home-movies';
 import RecoverPassword from '../pages/recoverPassword';
+import ResetPassword from '../pages/resetPassword';
 import ProtectedRoutes from './protectedRoutes';
 import ProtectedRoute from '../components/ProtectedRoute';
 
@@ -26,6 +27,7 @@ const AppRouters: React.FC = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/recover-password" element={<RecoverPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/home-movies" element={<HomeMovies />} />
 
       

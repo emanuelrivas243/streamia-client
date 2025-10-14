@@ -171,9 +171,19 @@ export const authAPI = {
    * Request password recovery
    */
   async recoverPassword(email: string): Promise<ApiResponse> {
-    return makeRequest('/api/users/recover-password', {
+    return makeRequest('/api/users/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Reset password with token
+   */
+  async resetPassword(token: string, newPassword: string): Promise<ApiResponse> {
+    return makeRequest('/api/users/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
     });
   },
 

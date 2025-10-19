@@ -297,17 +297,17 @@ export const authAPI = {
 };
 
 /**
- * Movies API functions (for future implementation).
+ * Movies API functions for backend integration.
  */
 export const moviesAPI = {
   /**
-   * Get all movies from the API.
+   * Get all movies from the backend API.
    *
    * @param token - Authentication token
    * @returns ApiResponse<any[]>
    */
   async getMovies(token: string): Promise<ApiResponse<any[]>> {
-    return makeRequest<any[]>('/movies', {
+    return makeRequest<any[]>('/api/movies', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -323,7 +323,46 @@ export const moviesAPI = {
    * @returns ApiResponse<any>
    */
   async getMovieById(token: string, movieId: string): Promise<ApiResponse<any>> {
-    return makeRequest<any>(`/movies/${movieId}`, {
+    return makeRequest<any>(`/api/movies/${movieId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+
+  /**
+   * Get popular videos from PEXELS via backend.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse<any[]>
+   */
+  async getPopularVideos(token: string): Promise<ApiResponse<any[]>> {
+    return makeRequest<any[]>('/api/movies/external/popular', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+
+  /**
+   * Explore movies with search and filters.
+   *
+   * @param token - Authentication token
+   * @param search - Search query
+   * @param category - Category filter
+   * @returns ApiResponse<any[]>
+   */
+  async exploreMovies(token: string, search?: string, category?: string): Promise<ApiResponse<any[]>> {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (category) params.append('category', category);
+    
+    const queryString = params.toString();
+    const endpoint = `/api/movies/explore${queryString ? `?${queryString}` : ''}`;
+    
+    return makeRequest<any[]>(endpoint, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

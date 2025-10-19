@@ -6,25 +6,28 @@
  */
 
 export const API_BASE_URL =
-  (import.meta as any).env.VITE_API_URL || "http://localhost:3000/api/users";
+  (import.meta as any).env.VITE_API_URL || "http://localhost:3000";
+
 
 export const config = {
   API_BASE_URL,
 
   ENDPOINTS: {
     AUTH: {
-      REGISTER: `${API_BASE_URL}/register`,
-      LOGIN: `${API_BASE_URL}/login`,
-      LOGOUT: `${API_BASE_URL}/logout`,
-      PROFILE: `${API_BASE_URL}/me`,
-      UPDATE_PROFILE: `${API_BASE_URL}/me`,
-      DELETE_ACCOUNT: `${API_BASE_URL}/me`,
-      FORGOT_PASSWORD: `${API_BASE_URL}/forgot-password`,
-      RESET_PASSWORD: `${API_BASE_URL}/reset-password`,
+      REGISTER: `${API_BASE_URL}/api/users/register`,
+      LOGIN: `${API_BASE_URL}/api/users/login`,
+      LOGOUT: `${API_BASE_URL}/api/users/logout`,
+      PROFILE: `${API_BASE_URL}/api/users/me`,
+      UPDATE_PROFILE: `${API_BASE_URL}/api/users/me`,
+      DELETE_ACCOUNT: `${API_BASE_URL}/api/users/me`,
+      FORGOT_PASSWORD: `${API_BASE_URL}/api/users/forgot-password`,
+      RESET_PASSWORD: `${API_BASE_URL}/api/users/reset-password`,
     },
     MOVIES: {
-      LIST: "http://localhost:3000/api/movies",
-      DETAIL: (id: string) => `http://localhost:3000/api/movies/${id}`,
+      LIST: `${API_BASE_URL}/api/movies`,
+      DETAIL: (id: string) => `${API_BASE_URL}/api/movies/${id}`,
+      POPULAR: `${API_BASE_URL}/api/movies/external/popular`,
+      EXPLORE: `${API_BASE_URL}/api/movies/explore`,
     },
   },
 

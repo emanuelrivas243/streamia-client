@@ -11,6 +11,8 @@ export interface Movie {
   year: number;
   rating: number;
   description?: string;
+  videoUrl?: string;
+  pexelsVideoId?: string;
 }
 
 /**
@@ -24,7 +26,8 @@ export const mockMovies: Movie[] = [
     category: "Acción",
     year: 2023,
     rating: 8.5,
-    description: "John Wick libra una guerra total contra el Alto Consejo, enfrentando nuevos enemigos y alianzas en una batalla imparable."
+    description: "John Wick libra una guerra total contra el Alto Consejo, enfrentando nuevos enemigos y alianzas en una batalla imparable.",
+    pexelsVideoId: "action-movie-trailer"
   },
   {
     id: 2,
@@ -33,7 +36,8 @@ export const mockMovies: Movie[] = [
     category: "Drama",
     year: 2023,
     rating: 7.8,
-    description: "Batman investiga una red de corrupción en Gotham mientras se enfrenta a un enigmático asesino serial."
+    description: "Batman investiga una red de corrupción en Gotham mientras se enfrenta a un enigmático asesino serial.",
+    pexelsVideoId: "batman-drama-scene"
   },
   {
     id: 3,
@@ -42,7 +46,8 @@ export const mockMovies: Movie[] = [
     category: "Anime",
     year: 2023,
     rating: 9.2,
-    description: "Los cazadores de demonios son arrastrados al Castillo del Infinito para afrontar batallas definitivas contra demonios de alto rango."
+    description: "Los cazadores de demonios son arrastrados al Castillo del Infinito para afrontar batallas definitivas contra demonios de alto rango.",
+    pexelsVideoId: "anime-fight-scene"
   },
   {
     id: 4,
@@ -51,7 +56,8 @@ export const mockMovies: Movie[] = [
     category: "Comedia",
     year: 2023,
     rating: 7.5,
-    description: "Un grupo de idols K‑Pop dobla como cazadoras de demonios, equilibrando escenarios y peligros sobrenaturales."
+    description: "Un grupo de idols K‑Pop dobla como cazadoras de demonios, equilibrando escenarios y peligros sobrenaturales.",
+    pexelsVideoId: "kpop-dance-performance"
   },
   {
     id: 5,
@@ -60,7 +66,8 @@ export const mockMovies: Movie[] = [
     category: "Thriller",
     year: 2023,
     rating: 8.0,
-    description: "Un thriller que entrelaza historias oscuras alrededor de un misterioso accidente y sus consecuencias."
+    description: "Un thriller que entrelaza historias oscuras alrededor de un misterioso accidente y sus consecuencias.",
+    pexelsVideoId: "thriller-suspense-scene"
   },
   {
     id: 6,
@@ -69,7 +76,8 @@ export const mockMovies: Movie[] = [
     category: "Drama",
     year: 1989,
     rating: 8.9,
-    description: "La historia no contada de las brujas de Oz, donde amistad y destino chocan en un mundo de magia."
+    description: "La historia no contada de las brujas de Oz, donde amistad y destino chocan en un mundo de magia.",
+    pexelsVideoId: "magical-drama-scene"
   },
   {
     id: 7,
@@ -78,6 +86,7 @@ export const mockMovies: Movie[] = [
     category: "Suspense",
     year: 2023,
     rating: 7.2,
-    description: "Elio es transportado accidentalmente a una asamblea intergaláctica y debe representar a la Tierra."
+    description: "Elio es transportado accidentalmente a una asamblea intergaláctica y debe representar a la Tierra.",
+    pexelsVideoId: "sci-fi-space-scene"
   }
 ];

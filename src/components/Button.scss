@@ -37,6 +37,22 @@
     }
   }
 
+  &.is-favorite, &.is-favorite.btn--secondary {
+    background: $primary-color;
+    color: #ffffff;
+    border-color: $primary-color;
+
+    svg, path {
+      stroke: none;
+      fill: #ffffff;
+    }
+
+    &:hover:not(:disabled) {
+      background: darken($primary-color, 6%);
+      border-color: darken($primary-color, 6%);
+    }
+  }
+
   // Sizes
   &--small {
     padding: 0.5rem 1rem;

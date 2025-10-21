@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { ArrowLeft, User, Mail, Lock, Calendar, Eye, EyeOff, Shield } from "lucide-react";
+import { ArrowLeft, User, Mail, Lock, Calendar, Eye, EyeOff } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/authContext";
 import { 
@@ -8,8 +8,7 @@ import {
   validateAge, 
   validateName,
   sanitizeInput,
-  getPasswordStrengthText,
-  getPasswordStrengthColor,
+  
   DEFAULT_PASSWORD_REQUIREMENTS
 } from "../utils/security";
 import "../styles/register.scss";
@@ -140,7 +139,7 @@ export default function Register() {
     const registrationData = {
       firstName: formData.nombre.trim(),
       lastName: formData.apellido.trim(),
-      age: parseInt(formData.edad, 10),
+  age: Number.parseInt(formData.edad, 10),
       email: formData.email.trim().toLowerCase(),
       password: formData.password,
       confirmPassword: formData.confirmPassword
@@ -245,8 +244,7 @@ export default function Register() {
                 )}
               </div>
 
-              {/* Fila 2 - Edad y Email */}
-              <div className="input-group">
+              <div className="input-group full-width">
                 <div className="input-container">
                   <Calendar className="input-icon" size={20} />
                   <input
@@ -270,7 +268,7 @@ export default function Register() {
                 )}
               </div>
 
-              <div className="input-group">
+              <div className="input-group full-width">
                 <div className="input-container">
                   <Mail className="input-icon" size={20} />
                   <input

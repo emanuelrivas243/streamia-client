@@ -54,10 +54,60 @@
     );
     opacity: 0;
     transition: opacity $transition-normal;
+    pointer-events: none; // allow clicks to pass to buttons
   }
 
   &:hover &__overlay {
     opacity: 1;
+  }
+
+  &__favorite-badge {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 36px;
+    height: 36px;
+    border-radius: 999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    border: none;
+    cursor: pointer;
+    transition: transform $transition-fast;
+    padding: 0;
+
+    svg {
+      display: block;
+      path:first-child {
+        fill: #111827; // outline/darker part
+        opacity: 0.9;
+      }
+      path:last-child {
+        fill: #ffffff; // neutral gray heart when not favorite
+      }
+    }
+  }
+
+  &__favorite-badge:hover {
+    transform: scale(1.05);
+  }
+
+  &__favorite-badge.is-favorite {
+    z-index: 3;
+    background: #e50914;
+
+  }
+
+  &__click-target {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    z-index: 1;
   }
 
   &__title {

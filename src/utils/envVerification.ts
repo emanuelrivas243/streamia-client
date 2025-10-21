@@ -5,7 +5,7 @@
 
 // this file is not used but im afraid to delete it 
 
-import { config } from './environment';
+import { config } from '../config/environment';
 
 /**
  * Verify environment configuration

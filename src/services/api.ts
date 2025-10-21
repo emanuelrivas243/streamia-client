@@ -236,10 +236,10 @@ export const authAPI = {
    * @param newPassword - New password to set
    * @returns ApiResponse
    */
-  async resetPassword(token: string, newPassword: string): Promise<ApiResponse> {
+  async resetPassword(token: string, newPassword: string, confirmPassword:string): Promise<ApiResponse> {
     return makeRequest('/api/users/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ token, newPassword }),
+      body: JSON.stringify({ token, newPassword, confirmPassword }),
     });
   },
 

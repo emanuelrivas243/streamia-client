@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { authAPI } from '../services/api';
 import { validatePassword } from '../utils/security';
 import '../styles/reset-password.scss';
@@ -21,34 +21,27 @@ const ResetPassword: React.FC = () => {
     password?: string;
     confirmPassword?: string;
   }>({});
-  const [token, setToken] = useState<string | null>(null);
-  
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
 
-  // Get token from URL parameters
+  const navigate = useNavigate();
+  const { token } = useParams<{ token: string }>();
+
   useEffect(() => {
-    const tokenParam = searchParams.get('token');
-    if (!tokenParam) {
+    if (!token) {
       setError('Token de recuperación no válido o expirado');
-      return;
     }
-    setToken(tokenParam);
-  }, [searchParams]);
+  }, [token]);
 
   const handleBack = () => navigate(-1);
   const handleCancel = () => navigate('/');
 
   const validateForm = () => {
     const errors: { password?: string; confirmPassword?: string } = {};
-    
-    // Validate password
+
     const passwordValidation = validatePassword(password);
     if (!passwordValidation.isValid) {
       errors.password = passwordValidation.errors[0];
     }
 
-    // Validate confirm password
     if (confirmPassword !== password) {
       errors.confirmPassword = 'Las contraseñas no coinciden';
     }
@@ -63,9 +56,7 @@ const ResetPassword: React.FC = () => {
     setSuccess(null);
     setFieldErrors({});
 
-    if (!validateForm()) {
-      return;
-    }
+    if (!validateForm()) return;
 
     if (!token) {
       setError('Token de recuperación no válido');
@@ -73,27 +64,24 @@ const ResetPassword: React.FC = () => {
     }
 
     setIsLoading(true);
-    
+
     try {
-      const res = await authAPI.resetPassword(token, password);
-      
+      const res = await authAPI.resetPassword(token, password, confirmPassword);
       if (res.success) {
         setSuccess('Contraseña actualizada exitosamente. Redirigiendo al login...');
-        setTimeout(() => {
-          navigate('/login');
-        }, 2000);
+        setTimeout(() => navigate('/login'), 2000);
       } else {
         setError(res.error || 'No se pudo actualizar la contraseña. Intenta de nuevo.');
       }
-    } catch (error) {
+    } catch {
       setError('Error de conexión. Intenta de nuevo.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const togglePasswordVisibility = () => setShowPassword(!showPassword);
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword(!showConfirmPassword);
+  const togglePasswordVisibility = () => setShowPassword((prev) => !prev);
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
 
   if (!token && !error) {
     return (
@@ -122,8 +110,7 @@ const ResetPassword: React.FC = () => {
         {error && <div className="reset__alert reset__alert--error" role="alert">{error}</div>}
         {success && (
           <div className="reset__alert reset__alert--success" role="status">
-            <CheckCircle size={16} />
-            {success}
+            <CheckCircle size={16} /> {success}
           </div>
         )}
 
@@ -185,7 +172,7 @@ const ResetPassword: React.FC = () => {
           <button type="submit" className="reset__submit" disabled={isLoading}>
             {isLoading ? 'Actualizando...' : 'Actualizar contraseña'}
           </button>
-          
+
           <button type="button" className="reset__cancel" onClick={handleCancel} disabled={isLoading}>
             Cancelar
           </button>

@@ -34,9 +34,9 @@ const NavBar: React.FC = () => {
         {isAuthenticated && (
           <ul className="navbar__menu" role="menubar" aria-label="Primary">
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to={ROUTES.HOME}>Inicio</Link></li>
-            <li className="navbar__menu-item" role="none"><a role="menuitem" href="#">Películas</a></li>
-            <li className="navbar__menu-item" role="none"><a role="menuitem" href="#">Favoritos</a></li>
-            <li className="navbar__menu-item" role="none"><a role="menuitem" href="#">Mis calificaciones</a></li>
+            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/home-movies">Películas</Link></li>
+            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/Favorites">Favoritos</Link></li>
+            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="#">Mis calificaciones</Link></li>
           </ul>
         )}
 

@@ -23,7 +23,9 @@
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
   }
 
-  &__details { }
+  &__details {
+    display: block;
+  }
 
   &__title {
     font-size: 56px;
@@ -144,7 +146,7 @@
 
   // Video Player Modal - Show only in the movies section
   &__video-modal {
-    position: absolute;
+    position: fixed; /* center relative to viewport */
     top: 0;
     left: 0;
     right: 0;
@@ -153,7 +155,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1000;
+    z-index: 1100; /* above sticky search */
     padding: 20px;
     border-radius: 8px;
   }
@@ -196,6 +198,62 @@
       margin-bottom: 1.5rem;
     }
   }
-}
 
+  // Search Bar styles (adapted from txt file)
+  &__search-section {
+    padding: 1.5rem 2rem;
+    background: rgba(0, 0, 0, 0.95);
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    @media (max-width: 768px) {
+      padding: 1rem;
+    }
+  }
+
+  &__search-container {
+    position: relative;
+    max-width: 500px;
+    margin: 0 auto;
+  }
+
+  &__search-icon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #e50914;
+    transition: color 0.3s ease;
+  }
+
+  &__search-input {
+    width: 100%;
+    padding: 14px 20px 14px 48px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 25px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 400;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+
+    &:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.15);
+      border-color: #e50914;
+      box-shadow: 0 0 0 3px rgba(229, 9, 20, 0.2);
+    }
+
+    &::placeholder {
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  }
+}
 

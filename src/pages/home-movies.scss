@@ -226,6 +226,7 @@
     transform: translateY(-50%);
     color: #e50914;
     transition: color 0.3s ease;
+    z-index: 2;
   }
 
   &__search-input {

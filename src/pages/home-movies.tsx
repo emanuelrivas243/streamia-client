@@ -4,8 +4,10 @@ import Button from '../components/Button';
 import MovieCard from '../components/MovieCard';
 import VideoPlayer from '../components/VideoPlayer';
 import { mockMovies } from '../data/mockMovies';
+
 import './home-movies.scss';
 import { favoritesAPI, apiUtils } from '../services/api';
+import { original } from '@reduxjs/toolkit';
 
 /**
  * Home Movies detailed view with video playback functionality
@@ -249,7 +251,7 @@ const HomeMovies: React.FC = () => {
       </div>
 
       {/* Search Bar - centered above categories */}
-      <div className="home-movies__search-section">
+      <div className="home-movies__search">
         <div className="home-movies__search-container">
           <Search size={20} className="home-movies__search-icon" />
           <input
@@ -271,20 +273,23 @@ const HomeMovies: React.FC = () => {
           </h2>
           <div className="home-movies__grid">
             {filteredMovies.length > 0 ? (
-              filteredMovies.map((movie, idx) => (
-                <MovieCard
-                  key={movie.id}
-                  id={movie.id}
-                  title={movie.title}
-                  imageUrl={movie.imageUrl}
-                  isFavorite={favoritesIds.includes(String(movie.id))}
-                  onFavorite={(movieId) => {
-                    const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
-                    if (m) handleToggleFavorite(m);
-                  }}
-                  onClick={() => setSelectedMovieIndex(idx)}
+              filteredMovies.map((movie) => {
+                const originalIndex = mockMovies.findIndex(m => m.id === movie.id);
+                return(
+                  <MovieCard
+                    key={movie.id}
+                    id={movie.id}
+                    title={movie.title}
+                    imageUrl={movie.imageUrl}
+                    isFavorite={favoritesIds.includes(String(movie.id))}
+                    onFavorite={(movieId) => {
+                      const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
+                      if (m) handleToggleFavorite(m);
+                    }}
+                    onClick={() => setSelectedMovieIndex(originalIndex)}
                 />
-              ))
+              );
+            })
             ) : (
               <div className="home-movies__no-results">
                 <p>No se encontraron películas para "{searchQuery}"</p>

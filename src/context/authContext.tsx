@@ -102,7 +102,6 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
    */
   const register = async (userData: RegisterData): Promise<boolean> => {
     setIsLoading(true);
-          setSuccessMessage('Inicio de sesión exitoso');
     setError(null);
 
     try {

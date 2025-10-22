@@ -12,6 +12,7 @@ import ResetPassword from '../pages/resetPassword';
 import ProtectedRoutes from './protectedRoutes';
 import ProtectedRoute from '../components/ProtectedRoute';
 import EditProfile from '../pages/editProfile';
+import Favorites from '../pages/favorites';
 
 /**
  * Public application routes configuration
@@ -31,6 +32,7 @@ const AppRouters: React.FC = () => {
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       <Route path="/home-movies" element={<HomeMovies />} />
       <Route path="/edit-profile" element={<EditProfile />} />
+      <Route path="/favorites" element={<Favorites />} />
 
       
       

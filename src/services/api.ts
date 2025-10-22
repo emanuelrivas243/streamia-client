@@ -144,7 +144,7 @@ async function makeRequest<T>(
         // Unauthorized - token invalid or credentials wrong
         // Remove token locally to force re-authentication
         apiUtils.removeToken();
-        errorMsg = 'Sesión expirada. Inicia sesión de nuevo';
+        errorMsg = 'Correo o contraseña inválidos';
       } else if (response.status === 400) {
         // Bad Request - validation or malformed data
         errorMsg = data?.message || 'Solicitud inválida';
@@ -370,6 +370,88 @@ export const moviesAPI = {
     });
   },
 };
+
+/**
+ * Favorites API functions for backend integration.
+ */
+export const favoritesAPI = {
+  /**
+   * Get all favorites for the authenticated user.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse<any[]>
+   */
+  async getFavorites(token: string): Promise<ApiResponse<any[]>> {
+    return makeRequest<any[]>('/api/favorites', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+
+  /**
+   * Add a movie to favorites.
+   *
+   * @param token - Authentication token
+   * @param payload - Movie data: { movieId, title, poster, note? }
+   * @returns ApiResponse
+   */
+  async addFavorite(
+    token: string,
+    payload: { movieId: string; title: string; poster: string; note?: string }
+  ): Promise<ApiResponse> {
+    return makeRequest('/api/favorites', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  /**
+   * Update a note in a favorite movie.
+   *
+   * @param token - Authentication token
+   * @param id - Favorite document ID
+   * @param note - New note content
+   * @returns ApiResponse
+   */
+  async updateFavoriteNote(
+    token: string,
+    id: string,
+    note: string
+  ): Promise<ApiResponse> {
+    return makeRequest(`/api/favorites/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ note }),
+    });
+  },
+
+  /**
+   * Remove a movie from favorites.
+   *
+   * @param token - Authentication token
+   * @param movieId - Movie ID to remove
+   * @returns ApiResponse
+   */
+  async removeFavorite(
+    token: string,
+    movieId: string
+  ): Promise<ApiResponse> {
+    return makeRequest(`/api/favorites/${movieId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+};
+
 
 /**
  * Utility functions for token management and simple auth helpers.

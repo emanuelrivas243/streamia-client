@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Play, Heart, SlidersHorizontal, Star } from 'lucide-react';
+import { Play, Heart, SlidersHorizontal, Star, Search } from 'lucide-react';
 import Button from '../components/Button';
 import MovieCard from '../components/MovieCard';
 import VideoPlayer from '../components/VideoPlayer';
@@ -19,11 +19,29 @@ const HomeMovies: React.FC = () => {
   const [isLoadingVideo, setIsLoadingVideo] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filteredMovies, setFilteredMovies] = useState(mockMovies);
 
   const selectedMovie = mockMovies[selectedMovieIndex] ?? mockMovies[0];
 
   const handleRate = (value: number) => {
     setRating(value);
+  };
+
+  // Filter movies based on search query
+  useEffect(() => {
+    if (searchQuery.trim() === '') {
+      setFilteredMovies(mockMovies);
+    } else {
+      const filtered = mockMovies.filter(movie =>
+        movie.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredMovies(filtered);
+    }
+  }, [searchQuery]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
   };
 
   /**
@@ -230,6 +248,98 @@ const HomeMovies: React.FC = () => {
         </div>
       </div>
 
+      {/* Search Bar - centered above categories */}
+      <div className="home-movies__search-section">
+        <div className="home-movies__search-container">
+          <Search size={20} className="home-movies__search-icon" />
+          <input
+            type="text"
+            placeholder="Buscar películas..."
+            value={searchQuery}
+            onChange={handleSearch}
+            className="home-movies__search-input"
+          />
+        </div>
+      </div>
+
+      {/* Search Results */}
+      {searchQuery && (
+        <section className="home-movies__section">
+          <h2 className="home-movies__section-title">
+            Resultados de búsqueda: "{searchQuery}"
+            <span className="home-movies__results-count">({filteredMovies.length} películas)</span>
+          </h2>
+          <div className="home-movies__grid">
+            {filteredMovies.length > 0 ? (
+              filteredMovies.map((movie, idx) => (
+                <MovieCard
+                  key={movie.id}
+                  id={movie.id}
+                  title={movie.title}
+                  imageUrl={movie.imageUrl}
+                  isFavorite={favoritesIds.includes(String(movie.id))}
+                  onFavorite={(movieId) => {
+                    const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
+                    if (m) handleToggleFavorite(m);
+                  }}
+                  onClick={() => setSelectedMovieIndex(idx)}
+                />
+              ))
+            ) : (
+              <div className="home-movies__no-results">
+                <p>No se encontraron películas para "{searchQuery}"</p>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
+      {/* Popular Movies */}
+      {!searchQuery && (
+        <section className="home-movies__section">
+          <h2 className="home-movies__section-title">Películas Populares</h2>
+          <div className="home-movies__grid">
+            {mockMovies.slice(0, 4).map((movie, idx) => (
+              <MovieCard
+                key={movie.id}
+                id={movie.id}
+                title={movie.title}
+                imageUrl={movie.imageUrl}
+                isFavorite={favoritesIds.includes(String(movie.id))}
+                onFavorite={(movieId) => {
+                  const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
+                  if (m) handleToggleFavorite(m);
+                }}
+                onClick={() => setSelectedMovieIndex(idx)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Trending Movies */}
+      {!searchQuery && (
+        <section className="home-movies__section">
+          <h2 className="home-movies__section-title">Tendencias</h2>
+          <div className="home-movies__grid">
+            {mockMovies.slice(4, 8).map((movie, idx) => (
+              <MovieCard
+                key={movie.id}
+                id={movie.id}
+                title={movie.title}
+                imageUrl={movie.imageUrl}
+                isFavorite={favoritesIds.includes(String(movie.id))}
+                onFavorite={(movieId) => {
+                  const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
+                  if (m) handleToggleFavorite(m);
+                }}
+                onClick={() => setSelectedMovieIndex(idx + 4)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* More like this */}
       <section className="home-movies__more">
         <h2 className="home-movies__section-title">Más como esto</h2>
@@ -242,7 +352,6 @@ const HomeMovies: React.FC = () => {
               imageUrl={movie.imageUrl}
               isFavorite={favoritesIds.includes(String(movie.id))}
               onFavorite={(movieId) => {
-                // find movie object and reuse existing handler
                 const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
                 if (m) handleToggleFavorite(m);
               }}

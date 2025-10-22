@@ -7,7 +7,6 @@ import { mockMovies } from '../data/mockMovies';
 
 import './home-movies.scss';
 import { favoritesAPI, apiUtils } from '../services/api';
-import { original } from '@reduxjs/toolkit';
 
 /**
  * Home Movies detailed view with video playback functionality

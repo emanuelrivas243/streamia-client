@@ -22,6 +22,7 @@ const HomeMovies: React.FC = () => {
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredMovies, setFilteredMovies] = useState(mockMovies);
+  const [showMovieModal, setShowMovieModal] = useState<boolean>(false);
 
   const selectedMovie = mockMovies[selectedMovieIndex] ?? mockMovies[0];
 
@@ -43,6 +44,15 @@ const HomeMovies: React.FC = () => {
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
+  };
+
+  const handleMovieClick = (movieIndex: number) => {
+    setSelectedMovieIndex(movieIndex);
+    setShowMovieModal(true);
+  };
+
+  const handleCloseMovieModal = () => {
+    setShowMovieModal(false);
   };
 
   /**
@@ -175,79 +185,6 @@ const HomeMovies: React.FC = () => {
 
   return (
     <div className="home-movies">
-      <div className="home-movies__hero">
-        {/* Poster */}
-        <div
-          className="home-movies__poster"
-          aria-label={`Póster de ${selectedMovie.title}`}
-          style={{ backgroundImage: `url(${selectedMovie.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-        />
-
-        {/* Details */}
-        <div className="home-movies__details">
-          <h1 className="home-movies__title">{selectedMovie.title}</h1>
-          <p className="home-movies__description">
-            {selectedMovie.description}
-          </p>
-
-          {/* Actions */}
-          <div className="home-movies__actions">
-            <Button 
-              variant="primary" 
-              size="medium" 
-              className="home-movies__action-btn"
-              onClick={handlePlayMovie}
-              disabled={isLoadingVideo}
-            >
-              <Play size={18} />
-              <span>{isLoadingVideo ? 'Cargando...' : 'Ver ahora'}</span>
-            </Button>
-
-            <Button
-              variant="secondary"
-              size="medium"
-              className={`home-movies__action-btn ${isSelectedFavorite ? 'is-favorite' : ''}`}
-              onClick={() => handleToggleFavorite(selectedMovie)}
-            >
-              {isSelectedFavorite ? (
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                  <path d="M12 21s-7-4.35-9-6.5C-0.5 11.5 2.5 6 6.5 6c2 0 3.5 1.25 5.5 3.25C13 7.25 14.5 6 16.5 6 20.5 6 23.5 11.5 21 14.5 19 16.65 12 21 12 21z" fill="#ffffff"/>
-                  <path d="M12.1 8.64c-.9-1.03-2.5-1.03-3.4 0-.87.98-.87 2.56 0 3.54l3.4 3.48 3.4-3.48c.87-.98.87-2.56 0-3.54-.9-1.03-2.5-1.03-3.4 0z" fill="#ffffff"/>
-                </svg>
-              ) : (
-                <Heart size={18} color="#9ca3af" />
-              )}
-              <span>{isSelectedFavorite ? 'Quitar de favoritos' : 'Marcar como favorita'}</span>
-            </Button>
-
-            <Button variant="outline" size="medium" className="home-movies__action-btn">
-              <SlidersHorizontal size={18} />
-              <span>Audio y subtítulos</span>
-            </Button>
-          </div>
-
-          {/* Rating */}
-          <div className="home-movies__rating">
-            <span className="home-movies__rating-label">Califica esta película</span>
-            <div className="home-movies__stars" role="radiogroup" aria-label="Calificación de la película">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`home-movies__star ${rating >= value ? 'is-active' : ''}`}
-                  onClick={() => handleRate(value)}
-                  aria-checked={rating === value}
-                  role="radio"
-                  aria-label={`${value} estrella${value > 1 ? 's' : ''}`}
-                >
-                  <Star size={22} />
-                </button>
-              ))}
-            </div>
-            <button type="button" className="home-movies__clear-rating">Eliminar calificación</button>
-          </div>
-        </div>
-      </div>
 
       {/* Search Bar - centered above categories */}
       <div className="home-movies__search">
@@ -314,7 +251,7 @@ const HomeMovies: React.FC = () => {
                   const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
                   if (m) handleToggleFavorite(m);
                 }}
-                onClick={() => setSelectedMovieIndex(idx)}
+                  onClick={() => handleMovieClick(idx)}
               />
             ))}
           </div>
@@ -337,7 +274,7 @@ const HomeMovies: React.FC = () => {
                   const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
                   if (m) handleToggleFavorite(m);
                 }}
-                onClick={() => setSelectedMovieIndex(idx + 4)}
+                onClick={() => handleMovieClick(idx + 4)}
               />
             ))}
           </div>
@@ -359,7 +296,7 @@ const HomeMovies: React.FC = () => {
                 const m = mockMovies.find((mm) => String(mm.id) === String(movieId));
                 if (m) handleToggleFavorite(m);
               }}
-              onClick={() => setSelectedMovieIndex(idx)}
+                  onClick={() => handleMovieClick(idx)}
             />
           ))}
         </div>
@@ -375,6 +312,95 @@ const HomeMovies: React.FC = () => {
           </div>
         )}
       </section>
+
+      {/* Movie Details Modal */}
+      {showMovieModal && (
+        <div className="home-movies__movie-modal">
+          <div className="home-movies__movie-modal-content">
+            <button 
+              className="home-movies__close-modal-btn"
+              onClick={handleCloseMovieModal}
+              aria-label="Cerrar modal"
+            >
+              ×
+            </button>
+            
+            <div className="home-movies__hero">
+              {/* Poster */}
+              <div
+                className="home-movies__poster"
+                aria-label={`Póster de ${selectedMovie.title}`}
+                style={{ backgroundImage: `url(${selectedMovie.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+              />
+
+              {/* Details */}
+              <div className="home-movies__details">
+                <h1 className="home-movies__title">{selectedMovie.title}</h1>
+                <p className="home-movies__description">
+                  {selectedMovie.description}
+                </p>
+
+                {/* Actions */}
+                <div className="home-movies__actions">
+                  <Button 
+                    variant="primary" 
+                    size="medium" 
+                    className="home-movies__action-btn"
+                    onClick={handlePlayMovie}
+                    disabled={isLoadingVideo}
+                  >
+                    <Play size={18} />
+                    <span>{isLoadingVideo ? 'Cargando...' : 'Ver ahora'}</span>
+                  </Button>
+
+                  <Button
+                    variant="secondary"
+                    size="medium"
+                    className={`home-movies__action-btn ${isSelectedFavorite ? 'is-favorite' : ''}`}
+                    onClick={() => handleToggleFavorite(selectedMovie)}
+                  >
+                    {isSelectedFavorite ? (
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
+                        <path d="M12 21s-7-4.35-9-6.5C-0.5 11.5 2.5 6 6.5 6c2 0 3.5 1.25 5.5 3.25C13 7.25 14.5 6 16.5 6 20.5 6 23.5 11.5 21 14.5 19 16.65 12 21 12 21z" fill="#ffffff"/>
+                        <path d="M12.1 8.64c-.9-1.03-2.5-1.03-3.4 0-.87.98-.87 2.56 0 3.54l3.4 3.48 3.4-3.48c.87-.98.87-2.56 0-3.54-.9-1.03-2.5-1.03-3.4 0z" fill="#ffffff"/>
+                      </svg>
+                    ) : (
+                      <Heart size={18} color="#9ca3af" />
+                    )}
+                    <span>{isSelectedFavorite ? 'Quitar de favoritos' : 'Marcar como favorita'}</span>
+                  </Button>
+
+                  <Button variant="outline" size="medium" className="home-movies__action-btn">
+                    <SlidersHorizontal size={18} />
+                    <span>Audio y subtítulos</span>
+                  </Button>
+                </div>
+
+                {/* Rating */}
+                <div className="home-movies__rating">
+                  <span className="home-movies__rating-label">Califica esta película</span>
+                  <div className="home-movies__stars" role="radiogroup" aria-label="Calificación de la película">
+                    {[1, 2, 3, 4, 5].map((value) => (
+                      <button
+                        key={value}
+                        type="button"
+                        className={`home-movies__star ${rating >= value ? 'is-active' : ''}`}
+                        onClick={() => handleRate(value)}
+                        aria-checked={rating === value}
+                        role="radio"
+                        aria-label={`${value} estrella${value > 1 ? 's' : ''}`}
+                      >
+                        <Star size={22} />
+                      </button>
+                    ))}
+                  </div>
+                  <button type="button" className="home-movies__clear-rating">Eliminar calificación</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Video Error Message */}
       {videoError && (

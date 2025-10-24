@@ -144,6 +144,57 @@
     &__title { font-size: 34px; }
   }
 
+  // Movie Details Modal
+  &__movie-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1200;
+    padding: 20px;
+  }
+
+  &__movie-modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 1000px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #0f0f0f;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  }
+
+  &__close-modal-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    z-index: 10;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
+    }
+  }
+
   // Video Player Modal - Show only in the movies section
   &__video-modal {
     position: fixed; /* center relative to viewport */
@@ -155,7 +206,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: 1100; /* above sticky search */
+    z-index: 1300; /* above movie modal */
     padding: 20px;
     border-radius: 8px;
   }

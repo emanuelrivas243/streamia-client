@@ -73,6 +73,13 @@ export function AuthProvider({ children }: Readonly<{ children: ReactNode }>) {
       
       if (response.success && response.data) {
         console.log("Token recibido del backend:", response.data.token);
+        
+        if (response.data.user && response.data.user.firstName) {
+        localStorage.setItem('currentUserName', response.data.user.firstName);
+      } else {
+        localStorage.setItem('currentUserName', credentials.email.split('@')[0]);
+      }
+
         // Save token and user data
         apiUtils.saveToken(response.data.token);
         setUser(response.data.user);

@@ -1,22 +1,20 @@
-/**
- * Favorites page
- *
- * Displays the user's favorite movies in a two-row horizontal layout.
- */
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
-import '../styles/favorites.scss';
+import './favorites.scss';
 import { favoritesAPI, apiUtils } from '../services/api';
 
 const Favorites: React.FC = () => {
   const [movies, setMovies] = React.useState<Array<{ id: number; title: string; imageUrl: string }>>([]);
-  const [isLoading, setIsLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
   const token = apiUtils.getToken();
+  const navigate = useNavigate();
 
-React.useEffect(() => {
+  React.useEffect(() => {
+    loadFavorites();
+  }, []);
+
   const loadFavorites = async () => {
-    setIsLoading(true);
     try {
       const resp = await favoritesAPI.getFavorites(token || '');
 
@@ -35,47 +33,70 @@ React.useEffect(() => {
       setMovies(items);
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
-    } finally {
-      setIsLoading(false);
     }
   };
 
-  loadFavorites();
-}, []);
+  const handleRemoveFavorite = async (movieId: number | string) => {
+    if (!token) {
+      alert('Inicia sesión para gestionar favoritos');
+      return;
+    }
 
+    try {
+      const resp = await favoritesAPI.removeFavorite(token, String(movieId));
+      if (resp.success) {
+        setMovies(prev => prev.filter(movie => String(movie.id) !== String(movieId)));
+      } else {
+        alert(resp.error || 'No se pudo quitar de favoritos');
+      }
+    } catch (err) {
+      console.error('Error removing favorite:', err);
+      alert('Error al quitar de favoritos');
+    }
+  };
 
+  const handleFavoriteToggle = (movieId: number | string) => {
+    handleRemoveFavorite(movieId);
+  };
 
-  // Prepare rows for rendering
-  const firstRow = movies.slice(0, 6);
-  const secondRow = movies.slice(6, 12);
+  const handleMovieClick = (movieId: number | string) => {
+    navigate(`/movie/${movieId}`);
+  };
 
   return (
     <div className="favorites page">
-      <div className="favorites__hero">
-        <div className="favorites__hero-inner">
-          <h1 className="favorites__title">Mis Favoritos</h1>
-          <p className="favorites__count">{movies.length} películas</p>
-        </div>
+      <div className="favorites__header">
+        <h1 className="favorites__title">Mis Favoritos</h1>
+        <p className="favorites__count">{movies.length} película{movies.length !== 1 ? 's' : ''}</p>
       </div>
 
       <div className="favorites__content">
-        <div className="favorites__row" aria-label="Favoritos fila 1">
-          {isLoading && <div className="favorites__loading">Cargando favoritos...</div>}
-          {error && <div className="favorites__error" role="alert">{error}</div>}
-          {!isLoading && !error && firstRow.map((m) => (
-            <div className="favorites__card" key={`r1-${m.id}`}>
-              <MovieCard id={m.id} title={m.title} imageUrl={m.imageUrl} isFavorite />
-            </div>
-          ))}
-        </div>
+        {error && <div className="favorites__error" role="alert">{error}</div>}
+        
+        {!error && movies.length > 0 && (
+          <div className="favorites__row" aria-label="Películas favoritas">
+            {movies.map((m) => (
+              <div className="favorites__card" key={m.id}>
+                <MovieCard 
+                  id={m.id} 
+                  title={m.title} 
+                  imageUrl={m.imageUrl} 
+                  isFavorite 
+                  onClick={() => handleMovieClick(m.id)}
+                  onFavorite={handleFavoriteToggle}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
-        <div className="favorites__row" aria-label="Favoritos fila 2">
-          {!isLoading && !error && secondRow.map((m) => (
-            <div className="favorites__card" key={`r2-${m.id}`}>
-              <MovieCard id={m.id} title={m.title} imageUrl={m.imageUrl} isFavorite />
-            </div>
-          ))}
-        </div>
+        {!error && movies.length === 0 && (
+          <div className="favorites__empty">
+            <div className="favorites__empty-icon">❤️</div>
+            <h3>No tienes películas favoritas</h3>
+            <p>Agrega películas a favoritos para verlas aquí</p>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -301,18 +301,6 @@ const MovieDetailPage: React.FC = () => {
           
           <div className="movie-detail__comment-rating">
             <span>Tu calificación:</span>
-            <div className="movie-detail__stars">
-              {[1, 2, 3, 4, 5].map((value) => (
-                <button
-                  key={value}
-                  type="button"
-                  className={`movie-detail__star ${commentRating >= value ? 'is-active' : ''}`}
-                  onClick={() => setCommentRating(value)}
-                >
-                  <Star size={20} />
-                </button>
-              ))}
-            </div>
             {commentRating > 0 && (
               <span className="movie-detail__comment-rating-selected">
                 {commentRating} estrella{commentRating > 1 ? 's' : ''}

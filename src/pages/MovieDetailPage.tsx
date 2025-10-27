@@ -64,7 +64,7 @@ const MovieDetailPage: React.FC = () => {
 
     try {
       const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
-      const url = `${apiUrl}/videos/popular?per_page=10`;
+      const url = `${apiUrl}/${movie.id}`;
       
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Response status: ${response.status}`);

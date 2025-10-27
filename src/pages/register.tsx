@@ -201,7 +201,9 @@ export default function Register() {
               <div className="input-group">
                 <div className="input-container">
                   <User className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="nombre">Nombre</label>
                   <input
+                    id="nombre"
                     type="text"
                     name="nombre"
                     placeholder="Nombre"
@@ -224,7 +226,9 @@ export default function Register() {
               <div className="input-group">
                 <div className="input-container">
                   <User className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="apellido">Apellido</label>
                   <input
+                    id="apellido"
                     type="text"
                     name="apellido"
                     placeholder="Apellido"
@@ -247,7 +251,9 @@ export default function Register() {
               <div className="input-group full-width">
                 <div className="input-container">
                   <Calendar className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="edad">Edad</label>
                   <input
+                    id="edad"
                     type="number"
                     name="edad"
                     placeholder="Edad"
@@ -271,7 +277,9 @@ export default function Register() {
               <div className="input-group full-width">
                 <div className="input-container">
                   <Mail className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="email">Correo electrónico</label>
                   <input
+                    id="email"
                     type="email"
                     name="email"
                     placeholder="Correo electrónico"
@@ -295,7 +303,9 @@ export default function Register() {
               <div className="input-group full-width">
                 <div className="input-container has-toggle">
                   <Lock className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="password">Contraseña</label>
                   <input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     name="password"
                     placeholder="Contraseña"
@@ -329,7 +339,9 @@ export default function Register() {
               <div className="input-group full-width">
                 <div className="input-container has-toggle">
                   <Lock className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="confirmPassword">Confirmar contraseña</label>
                   <input
+                    id="confirmPassword"
                     type={showConfirmPassword ? "text" : "password"}
                     name="confirmPassword"
                     placeholder="Confirmar contraseña"

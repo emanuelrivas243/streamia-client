@@ -6,9 +6,9 @@
 export const ROUTES = {
   // Public Routes
   HOME: '/',
-  USUARIOHOME: '/homePage',
   ABOUT: '/about',
   CONTACT: '/contact',
+  MANUAL: '/manual',
   SITEMAP: '/sitemap',
   LOGIN: '/login',
   REGISTER: '/register',

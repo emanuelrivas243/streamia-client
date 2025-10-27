@@ -73,6 +73,9 @@ const Footer: React.FC = () => {
           <Link to={ROUTES.ABOUT} className="footer__link">
             Acerca de nosotros
           </Link>
+          <Link to={ROUTES.MANUAL} className="footer__link">
+            Manual de usuario
+          </Link>
           <Link to={ROUTES.SITEMAP} className="footer__link">
             Mapa del sitio
           </Link>

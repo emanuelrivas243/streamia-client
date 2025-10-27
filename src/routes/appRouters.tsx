@@ -11,8 +11,11 @@ import RecoverPassword from '../pages/recoverPassword';
 import ResetPassword from '../pages/resetPassword';
 import ProtectedRoutes from './protectedRoutes';
 import ProtectedRoute from '../components/ProtectedRoute';
+import HomePage from '../pages/homePage'; 
 import EditProfile from '../pages/editProfile';
 import Favorites from '../pages/favorites';
+import MovieDetailPage from '../pages/MovieDetailPage';
+import Manual from '../pages/manual';
 
 /**
  * Public application routes configuration
@@ -23,6 +26,7 @@ const AppRouters: React.FC = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<Home />} />
+       <Route path="/homePage" element={<HomePage />} /> 
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/sitemap" element={<Sitemap />} />
@@ -33,8 +37,10 @@ const AppRouters: React.FC = () => {
       <Route path="/home-movies" element={<HomeMovies />} />
       <Route path="/edit-profile" element={<EditProfile />} />
       <Route path="/favorites" element={<Favorites />} />
-
-      
+      <Route path="/movie/:id" element={<MovieDetailPage />} />
+      <Route path="/" element={<HomePage />} />
+      <Route path="/movies" element={<HomeMovies />} />
+      <Route path="/manual" element={<Manual />} />
       
     </Routes>
   );

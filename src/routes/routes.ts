@@ -8,6 +8,7 @@ export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   CONTACT: '/contact',
+  MANUAL: '/manual',
   SITEMAP: '/sitemap',
   LOGIN: '/login',
   REGISTER: '/register',

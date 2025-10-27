@@ -1,7 +1,4 @@
 import React, { useState } from 'react'
-/**
- * Navigation bar component used on top of all pages.
- */
 import { Link, useNavigate } from 'react-router-dom'
 import { ROUTES } from '../routes/routes'
 import { useAuth } from '../context/authContext'
@@ -22,18 +19,34 @@ const NavBar: React.FC = () => {
     navigate(ROUTES.HOME);
   };
 
+
+
+  const handleLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (isAuthenticated) {
+      navigate('/homePage'); 
+    } else {
+      navigate(ROUTES.LOGIN); 
+    }
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar__container">
-        {/* Logo */}
-        <Link to={ROUTES.HOME} className="navbar__logo">
+       
+        <a 
+          href="#" 
+          className="navbar__logo" 
+          onClick={handleLogoClick}
+          style={{ cursor: 'pointer', textDecoration: 'none' }}
+        >
           STREAMIA
-        </Link>
+        </a>
 
         {/* Primary navigation (only when authenticated) */}
         {isAuthenticated && (
           <ul className="navbar__menu" role="menubar" aria-label="Primary">
-            <li className="navbar__menu-item" role="none"><Link role="menuitem" to={ROUTES.HOME}>Inicio</Link></li>
+            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/homePage">Inicio</Link></li>
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/home-movies">Películas</Link></li>
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/Favorites">Favoritos</Link></li>
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="#">Mis calificaciones</Link></li>

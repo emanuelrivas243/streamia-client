@@ -332,4 +332,13 @@
       height: 32px;
     }
   }
+  // Botón pantalla completa especial
+.video-player__fullscreen-btn {
+  background: rgba(245, 158, 11, 0.8) !important;
+  
+  &:hover {
+    background: rgba(245, 158, 11, 1) !important;
+    transform: scale(1.1);
+  }
+}
 }

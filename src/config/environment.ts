@@ -22,6 +22,7 @@ export const config = {
       DELETE_ACCOUNT: `${API_BASE_URL}/api/users/me`,
       FORGOT_PASSWORD: `${API_BASE_URL}/api/users/forgot-password`,
       RESET_PASSWORD: `${API_BASE_URL}/api/users/reset-password`,
+      MANUAL: `${API_BASE_URL}/api/users/manual`,
     },
     MOVIES: {
       LIST: `${API_BASE_URL}/api/movies`,

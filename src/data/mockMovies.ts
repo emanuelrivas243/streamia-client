@@ -22,7 +22,7 @@ export const mockMovies: Movie[] = [
   {
     id: 1,
     title: "John Wick 4",
-    imageUrl: "/images/jhonwhick.jpg",
+    imageUrl: "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
     category: "Acción",
     year: 2023,
     rating: 8.5,
@@ -32,7 +32,7 @@ export const mockMovies: Movie[] = [
   {
     id: 2,
     title: "Batman",
-    imageUrl: "/images/batman.jpg",
+    imageUrl: "https://i.ibb.co/rBZd4CY/imagen-2025-10-25-175217428.png",
     category: "Drama",
     year: 2023,
     rating: 7.8,
@@ -42,7 +42,7 @@ export const mockMovies: Movie[] = [
   {
     id: 3,
     title: "Demon Slayer",
-    imageUrl: "/images/demonslayer.jpg",
+    imageUrl: "https://i.ibb.co/4RGmBZzf/imagen-2025-10-25-172857480.png",
     category: "Anime",
     year: 2023,
     rating: 9.2,
@@ -72,7 +72,7 @@ export const mockMovies: Movie[] = [
   {
     id: 6,
     title: "Wicked",
-    imageUrl: "/images/wicked.avif",
+    imageUrl: "https://i.ibb.co/BVsCYh27/imagen-2025-10-25-174605393.png",
     category: "Drama",
     year: 1989,
     rating: 8.9,

@@ -3,7 +3,7 @@
  * Supports play, pause, stop, and video source management
  */
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Square, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
+import { Play, Pause, Square, Volume2, VolumeX, Maximize } from 'lucide-react';
 import './VideoPlayer.scss';
 
 /**
@@ -26,6 +26,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   onClose
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -34,6 +35,64 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
+  /**
+   * Enter fullscreen automatically when component mounts
+   */
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      if (containerRef.current) {
+        try {
+          await containerRef.current.requestFullscreen();
+          setIsFullscreen(true);
+        } catch (err) {
+          console.log('Error al entrar en pantalla completa:', err);
+        }
+      }
+    };
+
+    // Enter fullscreen after a short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      enterFullscreen();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  /**
+   * Handle fullscreen change events
+   */
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  /**
+   * Handle escape key to close video when in fullscreen
+   */
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Escape' && isFullscreen) {
+        onClose();
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        handlePlayPause();
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        handleFullscreenToggle();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isPlaying, isFullscreen]);
 
   /**
    * Handle play/pause toggle
@@ -67,6 +126,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  /**
+   * Handle fullscreen toggle
+   */
+  const handleFullscreenToggle = async () => {
+    try {
+      if (!document.fullscreenElement) {
+        await containerRef.current?.requestFullscreen();
+        setIsFullscreen(true);
+      } else {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      }
+    } catch (err) {
+      console.log('Error al cambiar pantalla completa:', err);
     }
   };
 
@@ -159,25 +235,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setShowControls(false);
   };
 
-  /**
-   * Handle keyboard shortcuts
-   */
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        handlePlayPause();
-      } else if (e.code === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [isPlaying]);
-
   return (
     <div 
+      ref={containerRef}
       className="video-player"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
@@ -196,6 +256,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
         onPause={() => setIsPlaying(false)}
         onEnded={() => setIsPlaying(false)}
         preload="metadata"
+        autoPlay // Auto-play when opened
         aria-label={`Reproduciendo ${title}`}
       />
 
@@ -300,6 +361,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </button>
+
+              {/* Fullscreen button */}
+              <button
+                className="video-player__control-btn video-player__fullscreen-btn"
+                onClick={handleFullscreenToggle}
+                aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+              >
+                <Maximize size={20} />
               </button>
             </div>
 

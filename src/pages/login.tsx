@@ -64,7 +64,7 @@ export default function Login() {
     
     if (success) {
       // Redirect to Home Movies on successful login and replace history
-      navigate('/home-movies', { replace: true });
+      navigate('/homePage', { replace: true });
     }
   };
 
@@ -97,14 +97,13 @@ export default function Login() {
   return (
     <div className="login-container">
       <div className="login-content">
-        {/* Logo */}
+
         <div className="logo">
-          {/* Logo content can be added here */}
+
         </div>
 
-        {/* Card del Formulario */}
         <div className="login-card">
-          {/* Botón Atrás */}
+
           <button 
             type="button"
             onClick={handleBackClick}
@@ -114,7 +113,6 @@ export default function Login() {
             <ArrowLeft size={20} />
           </button>
 
-          {/* Título */}
           <h2 className="login-title">Iniciar Sesión</h2>
 
           {/* Error message from API */}
@@ -124,11 +122,11 @@ export default function Login() {
             </div>
           )}
 
-          {/* Formulario */}
+        
           <form onSubmit={handleSubmit} className="login-form">
-            {/* Campos del Formulario */}
+  
             <div className="form-fields">
-              {/* Email */}
+          
               <div className="input-group">
                 <div className="input-container">
                   <Mail className="input-icon" size={20} />
@@ -150,7 +148,6 @@ export default function Login() {
                 )}
               </div>
 
-              {/* Contraseña */}
               <div className="input-group">
                 <div className="input-container has-toggle">
                   <Lock className="input-icon" size={20} />
@@ -181,7 +178,6 @@ export default function Login() {
               </div>
             </div>
 
-            {/* Enlaces de Ayuda */}
             <div className="help-links">
               <a href="/recover-password" className="forgot-password">
                 ¿Olvidaste tu contraseña?
@@ -192,7 +188,6 @@ export default function Login() {
               </p>
             </div>
 
-            {/* Botón de Iniciar Sesión */}
             <button 
               type="submit" 
               className="login-button"

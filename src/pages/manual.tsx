@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '../routes/routes';
 
 const Manual: React.FC = () => {
+  const pdfUrl = 'https://drive.google.com/uc?export=view&id=1u5GNcLqRV-Ac6AE5B97LPLGQuBgxJG1O';
+
   return (
     <div className="static-page static-page--manual manual-page">
       <div className="static-hero">
@@ -12,7 +14,14 @@ const Manual: React.FC = () => {
 
       <div className="static-content">
         <h1>Manual detallado del usuario</h1>
-        <p className="lead">Bienvenido al manual de usuario de Streamia. Aquí encontrarás instrucciones detalladas para utilizar todas las funcionalidades de la plataforma.</p>
+        <p className="lead">
+          Bienvenido al manual de usuario de Streamia. Aquí encontrarás instrucciones detalladas para utilizar todas las funcionalidades de la plataforma.
+        </p>
+
+        {/* 🔗 Enlace al PDF en Google Drive */}
+        <p>
+          📘 <a href={pdfUrl} target="_blank" rel="noopener noreferrer">Manual de usuario</a>
+        </p>
 
         <section className="manual-section">
           <h2>1. Registro y autenticación</h2>
@@ -56,7 +65,6 @@ const Manual: React.FC = () => {
             Si necesitas ayuda adicional, visita la página de <Link to={ROUTES.CONTACT}>Contacto</Link> o consulta el mapa del sitio.
           </p>
         </section>
-
       </div>
     </div>
   );

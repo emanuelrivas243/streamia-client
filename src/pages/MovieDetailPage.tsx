@@ -34,6 +34,11 @@ const MovieDetailPage: React.FC = () => {
 
   const movie = mockMovies.find(m => String(m.id) === id);
 
+  // Ensure page starts at the top when entering this screen
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, []);
+
   useEffect(() => {
   const loadCurrentUser = () => {
     const token = apiUtils.getToken();
@@ -161,6 +166,19 @@ const MovieDetailPage: React.FC = () => {
     setVideoUrl('');
     setVideoError(null);
   };
+
+  // When a modal (video or error) opens, scroll to top and lock background scroll
+  useEffect(() => {
+    const modalOpen = showVideoPlayer || !!videoError;
+    if (modalOpen) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      const previousOverflow = document.body.style.overflow;
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = previousOverflow;
+      };
+    }
+  }, [showVideoPlayer, videoError]);
 
   useEffect(() => {
     const loadUserFavorites = async () => {

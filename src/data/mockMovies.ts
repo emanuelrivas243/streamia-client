@@ -33,12 +33,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761666896/John_Wick_4_2023_ggihbb_gq4qfc.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761666896/John_Wick_4_2023_ggihbb_gq4qfc.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761668206/John_Wick_4_2023_ggihbb_en_1_qnpule.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761668206/John_Wick_4_2023_ggihbb_en_1_qnpule.vtt", // okay
       },
     ],
   },
@@ -55,12 +55,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761671999/Batman_2__El_Caballero_De_La_Noche_2008_ccl3gx_e0gig8.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761671999/Batman_2__El_Caballero_De_La_Noche_2008_ccl3gx_e0gig8.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761672271/Batman_2__El_Caballero_De_La_Noche_2008_ccl3gx_avwokv.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761672271/Batman_2__El_Caballero_De_La_Noche_2008_ccl3gx_avwokv.vtt", // okay
       },
     ],
   },
@@ -77,12 +77,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673455/Demon_Slayer_jiypse_es_pcj2nw.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673455/Demon_Slayer_jiypse_es_pcj2nw.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761662659/Demon_Slayer_jiypse_english_pxkvbu.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761662659/Demon_Slayer_jiypse_english_pxkvbu.vtt", // okay
       },
     ],
   },
@@ -99,12 +99,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761660647/K-POP_demon_hunters_uuhmqa_espa%C3%B1ol_v9ts4z.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761660647/K-POP_demon_hunters_uuhmqa_espa%C3%B1ol_v9ts4z.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761660074/K-POP_demon_hunters_uuhmqa_english_ak1wf8.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761660074/K-POP_demon_hunters_uuhmqa_english_ak1wf8.vtt", // okay
       },
     ],
   },
@@ -121,12 +121,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761661638/Weapons_fri1p3_espa%C3%B1ol_exlkx2.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761661638/Weapons_fri1p3_espa%C3%B1ol_exlkx2.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673023/Weapons_fri1p3_en_erxtfx.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673023/Weapons_fri1p3_en_erxtfx.vtt", // okay
       },
     ],
   },
@@ -143,12 +143,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761671836/Wicked_zzpbfm_es_wzvcyj.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761671836/Wicked_zzpbfm_es_wzvcyj.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761662457/Wicked_zzpbfm_english_cdlico.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761662457/Wicked_zzpbfm_english_cdlico.vtt", // okay
       },
     ],
   },
@@ -165,12 +165,12 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761661915/Elio___Disney_c8ilzy_espa%C3%B1ol_cwu8uo.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761661915/Elio___Disney_c8ilzy_espa%C3%B1ol_cwu8uo.vtt", // okay
       },
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761657717/Elio___Disney_c8ilzy_qmnms3.vtt", // bien
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761657717/Elio___Disney_c8ilzy_qmnms3.vtt", // okay
       },
     ],
   }

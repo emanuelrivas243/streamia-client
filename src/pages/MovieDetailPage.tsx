@@ -1,39 +1,79 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Play, Heart, SlidersHorizontal, Star, ArrowLeft } from 'lucide-react';
+import { Play, Heart, Star, ArrowLeft } from 'lucide-react';
 import Button from '../components/Button';
 import VideoPlayer from '../components/VideoPlayer';
 import { mockMovies } from '../data/mockMovies';
-import { favoritesAPI, ratingsAPI, apiUtils } from '../services/api';
+import { favoritesAPI, ratingsAPI, commentsAPI, apiUtils, Comment } from '../services/api';
 import './movie-detail.scss';
-
-interface Comment {
-  id: string;
-  user: string;
-  text: string;
-  timestamp: Date;
-  rating: number;
-}
 
 const MovieDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [rating, setRating] = useState<number>(0); // Iniciar en 0, se cargará desde el backend
+  const [rating, setRating] = useState<number>(0);
   const [showVideoPlayer, setShowVideoPlayer] = useState<boolean>(false);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [isLoadingVideo, setIsLoadingVideo] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
   const [currentUser, setCurrentUser] = useState<string>('');
-  const [userRating, setUserRating] = useState<number>(0); // Rating del usuario para esta película
-  const [ratingId, setRatingId] = useState<string | null>(null); // ID del rating en la base de datos
+  const [currentUserId, setCurrentUserId] = useState<string>('');
+  const [userRating, setUserRating] = useState<number>(0);
+  const [ratingId, setRatingId] = useState<string | null>(null);
   
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
-  const [commentRating, setCommentRating] = useState<number>(0);
+  const [isLoadingComments, setIsLoadingComments] = useState<boolean>(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState<boolean>(false);
   const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   const movie = mockMovies.find(m => String(m.id) === id);
+
+   // Ensure page starts at the top when entering this screen
+  useEffect(() => {
+    const loadComments = async () => {
+      if (!movie) return;
+      
+      setIsLoadingComments(true);
+      try {
+        const resp = await commentsAPI.getCommentsByMovie(String(movie.id));
+        if (resp.success && resp.data) {
+          setComments(resp.data);
+        } else {
+          console.error('Error loading comments:', resp.error);
+        }
+      } catch (error) {
+        console.error('Error loading comments:', error);
+      } finally {
+        setIsLoadingComments(false);
+      }
+    };
+
+    loadComments();
+  }, [movie]);
+
+
+  useEffect(() => {
+    const loadCurrentUser = () => {
+      const token = apiUtils.getToken();
+      if (token) {
+        try {
+     
+          const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+          setCurrentUserId(tokenPayload.id);
+          const userName = localStorage.getItem('currentUserName');
+          setCurrentUser(userName || 'Usuario');
+        } catch (error) {
+          console.error('Error parsing token:', error);
+          setCurrentUser('Usuario');
+        }
+      } else {
+        setCurrentUser('Invitado');
+      }
+    };
+
+    loadCurrentUser();
+  }, []);
 
   // Ensure page starts at the top when entering this screen
   useEffect(() => {
@@ -41,25 +81,76 @@ const MovieDetailPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-  const loadCurrentUser = () => {
-    const token = apiUtils.getToken();
-    if (token) {
-      const userName = localStorage.getItem('currentUserName');
-      setCurrentUser(userName || 'Usuario');
-    } else {
-      setCurrentUser('Invitado');
-    }
-  };
-
-  loadCurrentUser();
-}, []);
-
-  useEffect(() => {
     if (!movie) {
       navigate('/');
     }
   }, [movie, navigate]);
 
+
+  const handleAddComment = async () => {
+    if (!newComment.trim() || !movie) return;
+    
+    const token = apiUtils.getToken();
+    if (!token) {
+      alert('Inicia sesión para comentar');
+      return;
+    }
+
+    setIsSubmittingComment(true);
+    try {
+      const resp = await commentsAPI.createComment(token, {
+        movieId: String(movie.id),
+        text: newComment.trim()
+      });
+
+      if (resp.success && resp.data) {
+      
+        const commentsResp = await commentsAPI.getCommentsByMovie(String(movie.id));
+        if (commentsResp.success && commentsResp.data) {
+          setComments(commentsResp.data);
+        }
+        setNewComment('');
+      } else {
+        alert(resp.error || 'Error al publicar el comentario');
+      }
+    } catch (error) {
+      console.error('Error adding comment:', error);
+      alert('Error al publicar el comentario');
+    } finally {
+      setIsSubmittingComment(false);
+    }
+  };
+
+ 
+  const handleDeleteComment = async (commentId: string) => {
+    const token = apiUtils.getToken();
+    if (!token) return;
+
+    try {
+      const resp = await commentsAPI.deleteComment(token, commentId);
+      if (resp.success) {
+        setComments(prev => prev.filter(comment => comment._id !== commentId));
+      } else {
+        alert(resp.error || 'Error al eliminar el comentario');
+      }
+    } catch (error) {
+      console.error('Error deleting comment:', error);
+      alert('Error al eliminar el comentario');
+    }
+  };
+
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('es-ES', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+
+  // Resto de tus funciones existentes (mantén todo esto igual)
   const handleRate = async (value: number) => {
     if (!movie) return;
     
@@ -78,7 +169,6 @@ const MovieDetailPage: React.FC = () => {
       
       if (resp.success) {
         console.log('Rating saved successfully');
-        // Actualizar el ID si es un nuevo rating
         if (resp.data && resp.data.rating && resp.data.rating._id) {
           setRatingId(resp.data.rating._id);
         }
@@ -131,10 +221,9 @@ const MovieDetailPage: React.FC = () => {
     setVideoError(null);
 
     try {
-      const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
-
       // Backend may identify movies by different ids (numeric internal id, cloudinary public id, etc.)
       // Prefer explicit cloudinary/public id fields when available on the movie object.
+      const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
       const identifier = (movie as any).cloudinaryId || (movie as any).public_id || movie.id;
       const url = `${apiUrl}/api/movies/${identifier}`;
 
@@ -147,18 +236,17 @@ const MovieDetailPage: React.FC = () => {
       console.debug('getMovieById result', result);
       setSelectedMovie(result);
 
-      // Normalize several possible response shapes into a single videoUrl
+      
       const extractVideoUrl = (res: any): string | null => {
-        // Cloudinary: direct secure_url
         if (res.secure_url && typeof res.secure_url === 'string') return res.secure_url;
         if (res.secureUrl && typeof res.secureUrl === 'string') return res.secureUrl;
-
-        // Cloudinary: resources / eager arrays
+        
         if (Array.isArray(res.resources) && res.resources.length > 0) {
           const r = res.resources[0];
           if (r.secure_url) return r.secure_url;
           if (r.url) return r.url;
         }
+
         if (Array.isArray(res.eager) && res.eager.length > 0) {
           const e = res.eager[0];
           if (e.secure_url) return e.secure_url;
@@ -188,14 +276,12 @@ const MovieDetailPage: React.FC = () => {
       const foundUrl = extractVideoUrl(result);
       let foundSubtitles: any[] = [];
       if (result.subtitles && Array.isArray(result.subtitles)) {
-        // Si el backend ya manda los subtítulos así
         foundSubtitles = result.subtitles.map((s: any) => ({
           language: s.language || 'es',
           url: s.url || s.secure_url,
           label: s.label || 'Español'
         }));
       } else if (result.resources) {
-        // Si vienen embebidos entre los resources de Cloudinary
         foundSubtitles = result.resources
           .filter((r: any) => r.format === 'vtt' || r.format === 'srt')
           .map((r: any) => ({
@@ -219,7 +305,7 @@ const MovieDetailPage: React.FC = () => {
         setVideoUrl(foundUrl);
         setShowVideoPlayer(true);
       } else {
-        setVideoError('No se encontró una URL de video válida para esta película. Revisa el id o la respuesta del backend.');
+        setVideoError('No se encontró una URL de video válida para esta película.');
       }
     } catch (error) {
       console.error('Error loading video:', error);
@@ -235,7 +321,6 @@ const MovieDetailPage: React.FC = () => {
     setVideoError(null);
   };
 
-  // When a modal (video or error) opens, scroll to top and lock background scroll
   useEffect(() => {
     const modalOpen = showVideoPlayer || !!videoError;
     if (modalOpen) {
@@ -264,7 +349,7 @@ const MovieDetailPage: React.FC = () => {
     loadUserFavorites();
   }, []);
 
-  // Cargar la calificación del usuario para esta película
+
   useEffect(() => {
     const loadUserRating = async () => {
       if (!movie) return;
@@ -278,8 +363,8 @@ const MovieDetailPage: React.FC = () => {
           const movieRating = resp.data.find((r: any) => r.movieId === String(movie.id));
           if (movieRating) {
             setUserRating(movieRating.rating);
-            setRating(movieRating.rating); // También actualizar el rating visual
-            setRatingId(movieRating._id); // Guardar el ID del rating
+            setRating(movieRating.rating);
+            setRatingId(movieRating._id);
           } else {
             setUserRating(0);
             setRating(0);
@@ -321,32 +406,6 @@ const MovieDetailPage: React.FC = () => {
     }
   };
 
-  const handleAddComment = () => {
-    if (!newComment.trim()) return;
-    
-    const token = apiUtils.getToken();
-    if (!token) {
-      alert('Inicia sesión para comentar');
-      return;
-    }
-    
-    const comment: Comment = {
-      id: Date.now().toString(),
-      user: currentUser,
-      text: newComment,
-      timestamp: new Date(),
-      rating: commentRating
-    };
-    
-    setComments(prev => [comment, ...prev]);
-    setNewComment('');
-    setCommentRating(0);
-  };
-
-  const handleDeleteComment = (commentId: string) => {
-    setComments(prev => prev.filter(comment => comment.id !== commentId));
-  };
-
   const isFavorite = favoritesIds.includes(String(movie?.id));
 
   if (!movie) {
@@ -375,14 +434,14 @@ const MovieDetailPage: React.FC = () => {
     <div className="movie-detail">
       {showVideoPlayer && videoUrl && (
         <div className="movie-detail__video-modal-overlay">
-              <VideoPlayer
-                videoUrl={videoUrl}
-                title={movie.title}
-                onClose={handleCloseVideoPlayer}
-                subtitles={selectedMovie?.subtitles || []}
-                cloudinaryPublicId={selectedMovie?.public_id || selectedMovie?.publicId || movie.id}
-                cloudinaryCloudName={(selectedMovie && selectedMovie.cloudName) || 'dwmt0zy4j'}
-              />
+          <VideoPlayer
+            videoUrl={videoUrl}
+            title={movie.title}
+            onClose={handleCloseVideoPlayer}
+            subtitles={selectedMovie?.subtitles || []}
+            cloudinaryPublicId={selectedMovie?.public_id || selectedMovie?.publicId || movie.id}
+            cloudinaryCloudName={(selectedMovie && selectedMovie.cloudName) || 'dwmt0zy4j'}
+          />
         </div>
       )}
 
@@ -466,26 +525,19 @@ const MovieDetailPage: React.FC = () => {
         </div>
       </div>
 
+      
       <section className="movie-detail__comments">
         <h2 className="movie-detail__comments-title">
           Comentarios y Reseñas
           <span className="movie-detail__comments-count">({comments.length})</span>
         </h2>
         
+        {/* Formulario para nuevo comentario */}
         <div className="movie-detail__comment-form">
           <div className="movie-detail__comment-user-info">
             <span className="movie-detail__comment-user-label">
               Comentando como: <strong>{currentUser}</strong>
             </span>
-          </div>
-          
-          <div className="movie-detail__comment-rating">
-            <span>Tu calificación:</span>
-            {commentRating > 0 && (
-              <span className="movie-detail__comment-rating-selected">
-                {commentRating} estrella{commentRating > 1 ? 's' : ''}
-              </span>
-            )}
           </div>
           
           <textarea
@@ -494,21 +546,27 @@ const MovieDetailPage: React.FC = () => {
             placeholder="Comparte tu opinión sobre esta película..."
             className="movie-detail__comment-input"
             rows={4}
+            disabled={isSubmittingComment}
           />
           
           <Button 
             variant="primary" 
             size="medium" 
             onClick={handleAddComment}
-            disabled={!newComment.trim()}
+            disabled={!newComment.trim() || isSubmittingComment}
             className="movie-detail__comment-submit"
           >
-            Publicar Comentario
+            {isSubmittingComment ? 'Publicando...' : 'Publicar Comentario'}
           </Button>
         </div>
 
+      
         <div className="movie-detail__comments-list">
-          {comments.length === 0 ? (
+          {isLoadingComments ? (
+            <div className="movie-detail__comments-loading">
+              Cargando comentarios...
+            </div>
+          ) : comments.length === 0 ? (
             <div className="movie-detail__no-comments">
               <div className="movie-detail__no-comments-icon">💬</div>
               <h3>No hay comentarios aún</h3>
@@ -516,49 +574,33 @@ const MovieDetailPage: React.FC = () => {
             </div>
           ) : (
             comments.map((comment) => (
-              <div key={comment.id} className="movie-detail__comment">
+              <div key={comment._id} className="movie-detail__comment">
                 <div className="movie-detail__comment-header">
                   <div className="movie-detail__comment-user">
                     <div className="movie-detail__comment-avatar">
-                      {comment.user.charAt(0).toUpperCase()}
+                      {comment.userId.firstName.charAt(0).toUpperCase()}
                     </div>
                     <div className="movie-detail__comment-user-details">
                       <strong className="movie-detail__comment-username">
-                        {comment.user}
+                        {comment.userId.firstName} {comment.userId.lastName}
                       </strong>
-                      {comment.rating > 0 && (
-                        <div className="movie-detail__comment-rating-display">
-                          {[...Array(5)].map((_, i) => (
-                            <Star 
-                              key={i} 
-                              size={14} 
-                              fill={i < comment.rating ? "#f59e0b" : "none"}
-                              color="#f59e0b"
-                            />
-                          ))}
-                          <span className="movie-detail__comment-rating-text">
-                            ({comment.rating}/5)
-                          </span>
-                        </div>
-                      )}
+                      <span className="movie-detail__comment-email">
+                        {comment.userId.email}
+                      </span>
                     </div>
                   </div>
                   <div className="movie-detail__comment-meta">
                     <span className="movie-detail__comment-time">
-                      {comment.timestamp.toLocaleDateString('es-ES', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                      })}
+                      {formatDate(comment.createdAt)}
+                      {comment.updatedAt !== comment.createdAt && ' (editado)'}
                     </span>
-                    {comment.user === currentUser && (
+                    {comment.userId._id === currentUserId && (
                       <button 
-                        onClick={() => handleDeleteComment(comment.id)}
+                        onClick={() => handleDeleteComment(comment._id)}
                         className="movie-detail__comment-delete"
                         aria-label="Eliminar comentario"
                         title="Eliminar comentario"
+                        disabled={isSubmittingComment}
                       >
                         ×
                       </button>

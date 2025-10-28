@@ -88,6 +88,32 @@ export interface LoginResponse {
   token: string;
 }
 
+/**
+ * Comment interface
+ */
+export interface Comment {
+  _id: string;
+  userId: {
+    _id: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  movieId: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Create comment payload interface
+ */
+export interface CreateCommentData {
+  movieId: string;
+  text: string;
+}
+
+
 
 
 /**
@@ -545,6 +571,125 @@ export const ratingsAPI = {
     });
   },
 };
+
+/**
+ * Comment API functions for backend integration.
+ */
+export const commentsAPI = {
+  /**
+   * Get all comments for a specific movie.
+   *
+   * @param movieId - ID of the movie
+   * @returns ApiResponse<any[]>
+   */
+  async getCommentsByMovie(movieId: string): Promise<ApiResponse<any[]>> {
+    const token = apiUtils.getToken();
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    return makeRequest<any[]>(`/api/comments/${movieId}`, {
+      method: 'GET',
+      headers,
+    });
+  },
+
+  /**
+   * Create a new comment for a movie.
+   *
+   * @param token - Authentication token
+   * @param payload - Comment data: { movieId, text }
+   * @returns ApiResponse<any>
+   */
+  async createComment(
+    token: string,
+    payload: { movieId: string; text: string }
+  ): Promise<ApiResponse<any>> {
+    return makeRequest<any>('/api/comments', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  /**
+   * Update an existing comment.
+   *
+   * @param token - Authentication token
+   * @param commentId - Comment ID
+   * @param text - Updated comment text
+   * @returns ApiResponse<any>
+   */
+  async updateComment(
+    token: string,
+    commentId: string,
+    text: string
+  ): Promise<ApiResponse<any>> {
+    return makeRequest<any>(`/api/comments/${commentId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ text }),
+    });
+  },
+
+  /**
+   * Delete a comment.
+   *
+   * @param token - Authentication token
+   * @param commentId - Comment ID to delete
+   * @returns ApiResponse
+   */
+  async deleteComment(
+    token: string,
+    commentId: string
+  ): Promise<ApiResponse> {
+    return makeRequest(`/api/comments/${commentId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /**
  * Utility functions for token management and simple auth helpers.

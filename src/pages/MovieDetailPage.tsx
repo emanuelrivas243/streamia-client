@@ -31,6 +31,7 @@ const MovieDetailPage: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const [commentRating, setCommentRating] = useState<number>(0);
+  const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   const movie = mockMovies.find(m => String(m.id) === id);
 
@@ -131,27 +132,94 @@ const MovieDetailPage: React.FC = () => {
 
     try {
       const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
-      const url = `${apiUrl}/${movie.id}`;
-      
+
+      // Backend may identify movies by different ids (numeric internal id, cloudinary public id, etc.)
+      // Prefer explicit cloudinary/public id fields when available on the movie object.
+      const identifier = (movie as any).cloudinaryId || (movie as any).public_id || movie.id;
+      const url = `${apiUrl}/api/movies/${identifier}`;
+
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Response status: ${response.status}`);
 
       const result = await response.json();
-      
-      if (result.videos && result.videos.length > 0) {
-        const movieIndex = mockMovies.findIndex(m => m.id === movie.id);
-        const videoIndex = movieIndex % result.videos.length;
-        const selectedVideo = result.videos[videoIndex];
-        
-        if (selectedVideo.video_files && selectedVideo.video_files.length > 0) {
-          const videoUrl = selectedVideo.video_files[0].link;
-          setVideoUrl(videoUrl);
-          setShowVideoPlayer(true);
-        } else {
-          setVideoError('El video no tiene archivos disponibles.');
+      // Helpful debug log to inspect backend response shape when troubleshooting ids
+      // eslint-disable-next-line no-console
+      console.debug('getMovieById result', result);
+      setSelectedMovie(result);
+
+      // Normalize several possible response shapes into a single videoUrl
+      const extractVideoUrl = (res: any): string | null => {
+        // Cloudinary: direct secure_url
+        if (res.secure_url && typeof res.secure_url === 'string') return res.secure_url;
+        if (res.secureUrl && typeof res.secureUrl === 'string') return res.secureUrl;
+
+        // Cloudinary: resources / eager arrays
+        if (Array.isArray(res.resources) && res.resources.length > 0) {
+          const r = res.resources[0];
+          if (r.secure_url) return r.secure_url;
+          if (r.url) return r.url;
         }
+        if (Array.isArray(res.eager) && res.eager.length > 0) {
+          const e = res.eager[0];
+          if (e.secure_url) return e.secure_url;
+          if (e.url) return e.url;
+        }
+
+        if (res.videoUrl && typeof res.videoUrl === 'string') return res.videoUrl;
+        if (res.url && typeof res.url === 'string') return res.url;
+
+        if (res.video_files && Array.isArray(res.video_files) && res.video_files.length > 0) {
+          return res.video_files[0].link || res.video_files[0].file || null;
+        }
+
+        if (Array.isArray(res.videos) && res.videos.length > 0) {
+          const first = res.videos[0];
+          if (first.video_files && first.video_files.length > 0) return first.video_files[0].link || null;
+          if (first.url) return first.url;
+        }
+
+        if (res.data) return extractVideoUrl(res.data);
+        if (res.movie) return extractVideoUrl(res.movie);
+        if (res.video) return extractVideoUrl(res.video);
+
+        return null;
+      };
+
+      const foundUrl = extractVideoUrl(result);
+      let foundSubtitles: any[] = [];
+      if (result.subtitles && Array.isArray(result.subtitles)) {
+        // Si el backend ya manda los subtítulos así
+        foundSubtitles = result.subtitles.map((s: any) => ({
+          language: s.language || 'es',
+          url: s.url || s.secure_url,
+          label: s.label || 'Español'
+        }));
+      } else if (result.resources) {
+        // Si vienen embebidos entre los resources de Cloudinary
+        foundSubtitles = result.resources
+          .filter((r: any) => r.format === 'vtt' || r.format === 'srt')
+          .map((r: any) => ({
+            language: r.public_id.includes('en') ? 'en' : 'es',
+            url: r.secure_url,
+            label: r.public_id.includes('en') ? 'English' : 'Español'
+          }));
+      }
+      // If backend didn't provide subtitles, try to use the mockMovies entry's subtitles
+      if ((!foundSubtitles || foundSubtitles.length === 0) && movie && movie.subtitles) {
+        foundSubtitles = movie.subtitles.map((s: any) => ({
+          language: s.language,
+          url: s.url,
+          label: s.label || (s.language === 'en' ? 'English' : 'Español')
+        }));
+      }
+
+      setSelectedMovie({ ...result, subtitles: foundSubtitles });
+
+      if (foundUrl) {
+        setVideoUrl(foundUrl);
+        setShowVideoPlayer(true);
       } else {
-        setVideoError('No se encontraron videos en el backend.');
+        setVideoError('No se encontró una URL de video válida para esta película. Revisa el id o la respuesta del backend.');
       }
     } catch (error) {
       console.error('Error loading video:', error);
@@ -307,11 +375,14 @@ const MovieDetailPage: React.FC = () => {
     <div className="movie-detail">
       {showVideoPlayer && videoUrl && (
         <div className="movie-detail__video-modal-overlay">
-          <VideoPlayer
-            videoUrl={videoUrl}
-            title={movie.title}
-            onClose={handleCloseVideoPlayer}
-          />
+              <VideoPlayer
+                videoUrl={videoUrl}
+                title={movie.title}
+                onClose={handleCloseVideoPlayer}
+                subtitles={selectedMovie?.subtitles || []}
+                cloudinaryPublicId={selectedMovie?.public_id || selectedMovie?.publicId || movie.id}
+                cloudinaryCloudName={(selectedMovie && selectedMovie.cloudName) || 'dwmt0zy4j'}
+              />
         </div>
       )}
 
@@ -366,11 +437,6 @@ const MovieDetailPage: React.FC = () => {
                 <Heart size={18} color="#9ca3af" />
               )}
               <span>{isFavorite ? 'Quitar de favoritos' : 'Marcar como favorita'}</span>
-            </Button>
-
-            <Button variant="outline" size="medium" className="movie-detail__action-btn">
-              <SlidersHorizontal size={18} />
-              <span>Audio y subtítulos</span>
             </Button>
           </div>
 

@@ -4,7 +4,7 @@ import { Play, Heart, SlidersHorizontal, Star, ArrowLeft } from 'lucide-react';
 import Button from '../components/Button';
 import VideoPlayer from '../components/VideoPlayer';
 import { mockMovies } from '../data/mockMovies';
-import { favoritesAPI, apiUtils } from '../services/api';
+import { favoritesAPI, ratingsAPI, apiUtils } from '../services/api';
 import './movie-detail.scss';
 
 interface Comment {
@@ -18,13 +18,15 @@ interface Comment {
 const MovieDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [rating, setRating] = useState<number>(4);
+  const [rating, setRating] = useState<number>(0); // Iniciar en 0, se cargará desde el backend
   const [showVideoPlayer, setShowVideoPlayer] = useState<boolean>(false);
   const [videoUrl, setVideoUrl] = useState<string>('');
   const [isLoadingVideo, setIsLoadingVideo] = useState<boolean>(false);
   const [videoError, setVideoError] = useState<string | null>(null);
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
   const [currentUser, setCurrentUser] = useState<string>('');
+  const [userRating, setUserRating] = useState<number>(0); // Rating del usuario para esta película
+  const [ratingId, setRatingId] = useState<string | null>(null); // ID del rating en la base de datos
   
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
@@ -52,8 +54,68 @@ const MovieDetailPage: React.FC = () => {
     }
   }, [movie, navigate]);
 
-  const handleRate = (value: number) => {
+  const handleRate = async (value: number) => {
+    if (!movie) return;
+    
     setRating(value);
+    setUserRating(value);
+    
+    const token = apiUtils.getToken();
+    if (!token) {
+      alert('Inicia sesión para calificar esta película');
+      return;
+    }
+
+    try {
+      const payload = { movieId: String(movie.id), rating: value };
+      const resp = await ratingsAPI.addRating(token, payload);
+      
+      if (resp.success) {
+        console.log('Rating saved successfully');
+        // Actualizar el ID si es un nuevo rating
+        if (resp.data && resp.data.rating && resp.data.rating._id) {
+          setRatingId(resp.data.rating._id);
+        }
+      } else {
+        console.error('Failed to save rating:', resp.error);
+        alert(resp.error || 'No se pudo guardar la calificación');
+      }
+    } catch (error) {
+      console.error('Error saving rating:', error);
+      alert('Error al guardar la calificación');
+    }
+  };
+
+  const handleDeleteRating = async () => {
+    if (!ratingId) {
+      alert('No hay calificación para eliminar');
+      return;
+    }
+    
+    if (!movie) return;
+    
+    const token = apiUtils.getToken();
+    if (!token) {
+      alert('Inicia sesión para eliminar la calificación');
+      return;
+    }
+
+    try {
+      const resp = await ratingsAPI.deleteRating(token, ratingId);
+      
+      if (resp.success) {
+        setRating(0);
+        setUserRating(0);
+        setRatingId(null);
+        console.log('Rating deleted successfully');
+      } else {
+        console.error('Failed to delete rating:', resp.error);
+        alert(resp.error || 'No se pudo eliminar la calificación');
+      }
+    } catch (error) {
+      console.error('Error deleting rating:', error);
+      alert('Error al eliminar la calificación');
+    }
   };
 
   const handlePlayMovie = async () => {
@@ -115,6 +177,35 @@ const MovieDetailPage: React.FC = () => {
     };
     loadUserFavorites();
   }, []);
+
+  // Cargar la calificación del usuario para esta película
+  useEffect(() => {
+    const loadUserRating = async () => {
+      if (!movie) return;
+      
+      const token = apiUtils.getToken();
+      if (!token) return;
+
+      try {
+        const resp = await ratingsAPI.getUserRatings(token);
+        if (resp.success && resp.data) {
+          const movieRating = resp.data.find((r: any) => r.movieId === String(movie.id));
+          if (movieRating) {
+            setUserRating(movieRating.rating);
+            setRating(movieRating.rating); // También actualizar el rating visual
+            setRatingId(movieRating._id); // Guardar el ID del rating
+          } else {
+            setUserRating(0);
+            setRating(0);
+            setRatingId(null);
+          }
+        }
+      } catch (err) {
+        console.error('Load user rating error', err);
+      }
+    };
+    loadUserRating();
+  }, [movie]);
 
   const handleToggleFavorite = async () => {
     if (!movie) return;
@@ -279,7 +370,12 @@ const MovieDetailPage: React.FC = () => {
                 </button>
               ))}
             </div>
-            <button type="button" className="movie-detail__clear-rating">
+            <button 
+              type="button" 
+              className="movie-detail__clear-rating"
+              onClick={handleDeleteRating}
+              disabled={!ratingId || rating === 0}
+            >
               Eliminar calificación
             </button>
           </div>

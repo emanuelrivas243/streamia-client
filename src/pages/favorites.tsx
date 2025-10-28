@@ -1,11 +1,17 @@
+/**
+ * Favorites page
+ *
+ * Displays the user's favorite movies in a two-row horizontal layout.
+ */
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import MovieCard from '../components/MovieCard';
 import './favorites.scss';
 import { favoritesAPI, apiUtils } from '../services/api';
+import { mockMovies } from '../data/mockMovies';
 
 const Favorites: React.FC = () => {
-  const [movies, setMovies] = React.useState<Array<{ id: number; title: string; imageUrl: string }>>([]);
+  const [movies, setMovies] = React.useState<Array<{ id: string; title: string; imageUrl: string }>>([]);
   const [error, setError] = React.useState<string | null>(null);
   const token = apiUtils.getToken();
   const navigate = useNavigate();
@@ -24,11 +30,14 @@ const Favorites: React.FC = () => {
         return;
       }
 
-      const items = resp.data.map((fav: any) => ({
-        id: fav.movieId,
-        title: fav.title,
-        imageUrl: fav.poster || '/images/placeholder.png',
-      }));
+      const items = resp.data.map((fav: any) => {
+        const matched = mockMovies.find((m) => String(m.id) === String(fav.movieId));
+        return {
+          id: fav.movieId,
+          title: fav.title,
+          imageUrl: matched?.imageUrl || fav.poster || '/images/placeholder.png',
+        };
+      });
 
       setMovies(items);
     } catch (err) {

@@ -64,27 +64,64 @@ const MovieDetailPage: React.FC = () => {
 
     try {
       const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
-      const url = `${apiUrl}/${movie.id}`;
-      
+
+      // Backend may identify movies by different ids (numeric internal id, cloudinary public id, etc.)
+      // Prefer explicit cloudinary/public id fields when available on the movie object.
+      const identifier = (movie as any).cloudinaryId || (movie as any).public_id || movie.id;
+      const url = `${apiUrl}/api/movies/${identifier}`;
+
       const response = await fetch(url);
       if (!response.ok) throw new Error(`Response status: ${response.status}`);
 
       const result = await response.json();
-      
-      if (result.videos && result.videos.length > 0) {
-        const movieIndex = mockMovies.findIndex(m => m.id === movie.id);
-        const videoIndex = movieIndex % result.videos.length;
-        const selectedVideo = result.videos[videoIndex];
-        
-        if (selectedVideo.video_files && selectedVideo.video_files.length > 0) {
-          const videoUrl = selectedVideo.video_files[0].link;
-          setVideoUrl(videoUrl);
-          setShowVideoPlayer(true);
-        } else {
-          setVideoError('El video no tiene archivos disponibles.');
+      // Helpful debug log to inspect backend response shape when troubleshooting ids
+      // eslint-disable-next-line no-console
+      console.debug('getMovieById result', result);
+
+      // Normalize several possible response shapes into a single videoUrl
+      const extractVideoUrl = (res: any): string | null => {
+        // Cloudinary: direct secure_url
+        if (res.secure_url && typeof res.secure_url === 'string') return res.secure_url;
+        if (res.secureUrl && typeof res.secureUrl === 'string') return res.secureUrl;
+
+        // Cloudinary: resources / eager arrays
+        if (Array.isArray(res.resources) && res.resources.length > 0) {
+          const r = res.resources[0];
+          if (r.secure_url) return r.secure_url;
+          if (r.url) return r.url;
         }
+        if (Array.isArray(res.eager) && res.eager.length > 0) {
+          const e = res.eager[0];
+          if (e.secure_url) return e.secure_url;
+          if (e.url) return e.url;
+        }
+
+        if (res.videoUrl && typeof res.videoUrl === 'string') return res.videoUrl;
+        if (res.url && typeof res.url === 'string') return res.url;
+
+        if (res.video_files && Array.isArray(res.video_files) && res.video_files.length > 0) {
+          return res.video_files[0].link || res.video_files[0].file || null;
+        }
+
+        if (Array.isArray(res.videos) && res.videos.length > 0) {
+          const first = res.videos[0];
+          if (first.video_files && first.video_files.length > 0) return first.video_files[0].link || null;
+          if (first.url) return first.url;
+        }
+
+        if (res.data) return extractVideoUrl(res.data);
+        if (res.movie) return extractVideoUrl(res.movie);
+        if (res.video) return extractVideoUrl(res.video);
+
+        return null;
+      };
+
+      const foundUrl = extractVideoUrl(result);
+      if (foundUrl) {
+        setVideoUrl(foundUrl);
+        setShowVideoPlayer(true);
       } else {
-        setVideoError('No se encontraron videos en el backend.');
+        setVideoError('No se encontró una URL de video válida para esta película. Revisa el id o la respuesta del backend.');
       }
     } catch (error) {
       console.error('Error loading video:', error);

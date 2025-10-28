@@ -4,7 +4,7 @@
  */
 
 export interface Movie {
-  id: number;
+  id: string;
   title: string;
   imageUrl: string;
   category: string;
@@ -20,7 +20,7 @@ export interface Movie {
  */
 export const mockMovies: Movie[] = [
   {
-    id: 1,
+    id: "68fe440f0f375de5da710444",
     title: "John Wick 4",
     imageUrl: "https://image.tmdb.org/t/p/w500/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
     category: "Acción",
@@ -30,7 +30,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "action-movie-trailer"
   },
   {
-    id: 2,
+    id: "68fe6edc1f47ab544c72e3d5",
     title: "Batman",
     imageUrl: "https://i.ibb.co/rBZd4CY/imagen-2025-10-25-175217428.png",
     category: "Drama",
@@ -40,7 +40,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "batman-drama-scene"
   },
   {
-    id: 3,
+    id: "68fe73ef1f47ab544c72e3d8",
     title: "Demon Slayer",
     imageUrl: "https://i.ibb.co/4RGmBZzf/imagen-2025-10-25-172857480.png",
     category: "Anime",
@@ -50,7 +50,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "anime-fight-scene"
   },
   {
-    id: 4,
+    id: "68fe76501f47ab544c72e3db",
     title: "K-Pop Demon Hunters",
     imageUrl: "/images/kpopdemonhunters.jpg",
     category: "Comedia",
@@ -60,7 +60,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "kpop-dance-performance"
   },
   {
-    id: 5,
+    id: "68fe776a1f47ab544c72e3dd",
     title: "Weapons",
     imageUrl: "/images/waapons.jpg",
     category: "Thriller",
@@ -70,7 +70,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "thriller-suspense-scene"
   },
   {
-    id: 6,
+    id: "68fe51230f375de5da710446",
     title: "Wicked",
     imageUrl: "https://i.ibb.co/BVsCYh27/imagen-2025-10-25-174605393.png",
     category: "Drama",
@@ -80,7 +80,7 @@ export const mockMovies: Movie[] = [
     pexelsVideoId: "magical-drama-scene"
   },
   {
-    id: 7,
+    id: "69002c492df6874aea86dc46",
     title: "Elio",
     imageUrl: "/images/eliomovie.jpg",
     category: "Suspense",

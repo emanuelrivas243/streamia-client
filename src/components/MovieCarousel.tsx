@@ -9,7 +9,7 @@ import './MovieCarousel.scss';
  * Movie interface
  */
 interface Movie {
-  id: number;
+  id: string;
   title: string;
   imageUrl: string;
 }

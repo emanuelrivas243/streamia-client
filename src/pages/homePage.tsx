@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Heart, Info, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Button from '../components/Button';
 import MovieCard from '../components/MovieCard';
 import VideoPlayer from '../components/VideoPlayer';
@@ -20,7 +20,7 @@ const HomePage: React.FC = () => {
   
   const featuredMovies = [
     {
-      id: 1,
+      id: "68fe440f0f375de5da710444",
       title: "John Wick 4",
       description: "John Wick descubre un camino para derrotar a la Alta Mesa. Pero para ganar su libertad, debe enfrentarse a un nuevo enemigo con poderosas alianzas.",
       background: "https://image.tmdb.org/t/p/original/vZloFAK7NmvMGKE7VkF5UHaz0I.jpg",
@@ -28,7 +28,7 @@ const HomePage: React.FC = () => {
       year: 2023
     },
     {
-      id: 5, 
+      id: "68fe776a1f47ab544c72e3dd",
       title: "Weapons",
       description: "Todos los niños de la clase, excepto uno, desaparecen misteriosamente en la misma noche y exactamente a la misma hora. La comunidad se pregunta quién o qué está detrás de la desaparición.",
       background: "https://i.ibb.co/tM2fRWGQ/imagen-2025-10-25-173329618.png",
@@ -36,7 +36,7 @@ const HomePage: React.FC = () => {
       year: 2024
     },
     {
-      id: 6,
+      id: "68fe51230f375de5da710446",
       title: "Wicked",
       description: "La historia nunca antes contada de las Brujas de Oz, siguiendo a Elphaba y Glinda en su extraordinario viaje de amistad y destino.",
       background: "https://i.ibb.co/rR2T9khs/wp14661325-wicked-film-wallpapers.jpg",
@@ -44,7 +44,7 @@ const HomePage: React.FC = () => {
       year: 2024
     },
     {
-      id: 3,
+      id: "68fe73ef1f47ab544c72e3d8",
       title: "Demon Slayer",
       description: "Tanjiro y sus amigos se preparan para el entrenamiento de los Pilares mientras continúan su batalla contra los demonios.",
       background: "https://i.ibb.co/RTY4pwnq/imagen-2025-10-25-161041429.png",
@@ -78,47 +78,43 @@ const HomePage: React.FC = () => {
   /**
    * Get videos from backend
    */
-  const getData = async () => {
-    try {
-      const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
-      const url = `${apiUrl}/videos/popular?per_page=10`;
-      
-      const response = await fetch(url);
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
+const getData = async (movie: any) => {
+  try {
+    const identifier = movie.cloudinaryId || movie.public_id || movie.id;
+    const apiUrl = (import.meta as any).env.VITE_API_URL || 'http://localhost:3000';
+    const url = `${apiUrl}/api/movies/${identifier}`;
 
-      const result = await response.json();
-      
-      if (result.videos && result.videos.length > 0) {
-        const selectedVideo = result.videos[0];
-        
-        if (selectedVideo.video_files && selectedVideo.video_files.length > 0) {
-          const videoUrl = selectedVideo.video_files[0].link;
-          setVideoUrl(videoUrl);
-          setShowVideoPlayer(true);
-        } else {
-          setVideoError('El video no tiene archivos disponibles.');
-        }
-      } else {
-        setVideoError('No se encontraron videos en el backend.');
-      }
-    } catch (error) {
-      console.error('Error loading video from backend:', error);
-      setVideoError('Error al cargar el video. Verifica tu conexión a internet.');
-      throw error;
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Response status: ${response.status}`);
     }
-  };
+
+    const result = await response.json();
+
+    if (result.data && result.data.videoUrl) {
+      setVideoUrl(result.data.videoUrl);
+      setShowVideoPlayer(true);
+    } else {
+      setVideoError('No se encontró la URL del video en el backend.');
+    }
+
+  } catch (error) {
+    console.error('Error loading video from backend:', error);
+    setVideoError('Error al cargar el video. Verifica tu conexión a internet.');
+    throw error;
+  }
+};
+
 
   /**
    * Handle play button click - get video from backend
    */
-  const handlePlayMovie = async () => {
+  const handlePlayMovie = async (movie: any) => {
     setIsLoadingVideo(true);
     setVideoError(null);
 
     try {
-      await getData();
+      await getData(movie);
     } catch (error) {
       console.error('Error loading video from backend:', error);
       setVideoError('Error al cargar el video. Verifica tu conexión a internet.');
@@ -207,7 +203,7 @@ const HomePage: React.FC = () => {
                   <Button 
                     variant="primary" 
                     size="large" 
-                    onClick={handlePlayMovie}
+                    onClick={() => handlePlayMovie(movie)}
                     disabled={isLoadingVideo}
                   >
                     <Play size={24} fill="currentColor" /> 

@@ -8,12 +8,12 @@ import './MovieCard.scss';
  * Props interface for MovieCard component
  */
 interface MovieCardProps {
-  id: number;
+  id: string;
   title: string;
   imageUrl: string;
   className?: string;
   onClick?: () => void;
-  onFavorite?: (movieId: number, isFavorite: boolean) => void;
+  onFavorite?: (movieId: string, isFavorite: boolean) => void;
   isFavorite?: boolean;
 }
 

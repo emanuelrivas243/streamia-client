@@ -16,6 +16,7 @@ const HomePage: React.FC = () => {
   const [videoError, setVideoError] = useState<string | null>(null);
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   
   const featuredMovies = [
@@ -91,8 +92,21 @@ const getData = async (movie: any) => {
 
     const result = await response.json();
 
-    if (result.data && result.data.videoUrl) {
-      setVideoUrl(result.data.videoUrl);
+    // try to extract video url and subtitles from backend response
+    const videoFromBackend = result.data?.videoUrl || result.videoUrl || result.url || null;
+    // subtitles from backend if provided
+    const backendSubtitles = result.data?.subtitles || result.subtitles || [];
+
+    // fallback to mockMovies subtitles when backend doesn't provide them
+    const matchedMock = mockMovies.find((m) => String(m.id) === String(movie.id));
+    const fallbackSubtitles = matchedMock?.subtitles || [];
+
+    if (videoFromBackend) {
+      setVideoUrl(videoFromBackend);
+      setSelectedMovie({
+        ...movie,
+        subtitles: backendSubtitles.length > 0 ? backendSubtitles : fallbackSubtitles,
+      });
       setShowVideoPlayer(true);
     } else {
       setVideoError('No se encontró la URL del video en el backend.');
@@ -112,6 +126,7 @@ const getData = async (movie: any) => {
   const handlePlayMovie = async (movie: any) => {
     setIsLoadingVideo(true);
     setVideoError(null);
+    setSelectedMovie(movie);
 
     try {
       await getData(movie);
@@ -240,11 +255,11 @@ const getData = async (movie: any) => {
         </button>
 
         <div className="homepage__carousel-indicators">
-          {featuredMovies.map((_, index) => (
+          {featuredMovies.map((fm, idx) => (
             <button
-              key={index}
-              className={`homepage__carousel-indicator ${index === currentSlide ? 'active' : ''}`}
-              onClick={() => setCurrentSlide(index)}
+              key={fm.id}
+              className={`homepage__carousel-indicator ${idx === currentSlide ? 'active' : ''}`}
+              onClick={() => setCurrentSlide(idx)}
             />
           ))}
         </div>
@@ -293,15 +308,18 @@ const getData = async (movie: any) => {
       </section>
 
       {/* Video Player Modal */}
-      {showVideoPlayer && videoUrl && (
-        <div className="homepage__video-modal">
-          <VideoPlayer
-            videoUrl={videoUrl}
-            title="Reproduciendo película"
-            onClose={handleCloseVideoPlayer}
-          />
-        </div>
-      )}
+      {showVideoPlayer && videoUrl && selectedMovie && (
+              <div className="home-movies__video-modal">
+                <VideoPlayer
+                  videoUrl={videoUrl}
+                  title="Reproduciendo película"
+                  onClose={handleCloseVideoPlayer}
+                  subtitles={selectedMovie.subtitles || []}
+                  cloudinaryPublicId={selectedMovie?.public_id || selectedMovie?.publicId || selectedMovie?.id}
+                  cloudinaryCloudName={selectedMovie?.cloudName || 'dwmt0zy4j'}
+                />
+              </div>
+            )}
 
       {/* Video Error Message */}
       {videoError && (

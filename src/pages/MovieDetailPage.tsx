@@ -29,6 +29,7 @@ const MovieDetailPage: React.FC = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState<string>('');
   const [commentRating, setCommentRating] = useState<number>(0);
+  const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   const movie = mockMovies.find(m => String(m.id) === id);
 
@@ -77,6 +78,7 @@ const MovieDetailPage: React.FC = () => {
       // Helpful debug log to inspect backend response shape when troubleshooting ids
       // eslint-disable-next-line no-console
       console.debug('getMovieById result', result);
+      setSelectedMovie(result);
 
       // Normalize several possible response shapes into a single videoUrl
       const extractVideoUrl = (res: any): string | null => {
@@ -117,6 +119,35 @@ const MovieDetailPage: React.FC = () => {
       };
 
       const foundUrl = extractVideoUrl(result);
+      let foundSubtitles: any[] = [];
+      if (result.subtitles && Array.isArray(result.subtitles)) {
+        // Si el backend ya manda los subtítulos así
+        foundSubtitles = result.subtitles.map((s: any) => ({
+          language: s.language || 'es',
+          url: s.url || s.secure_url,
+          label: s.label || 'Español'
+        }));
+      } else if (result.resources) {
+        // Si vienen embebidos entre los resources de Cloudinary
+        foundSubtitles = result.resources
+          .filter((r: any) => r.format === 'vtt' || r.format === 'srt')
+          .map((r: any) => ({
+            language: r.public_id.includes('en') ? 'en' : 'es',
+            url: r.secure_url,
+            label: r.public_id.includes('en') ? 'English' : 'Español'
+          }));
+      }
+      // If backend didn't provide subtitles, try to use the mockMovies entry's subtitles
+      if ((!foundSubtitles || foundSubtitles.length === 0) && movie && movie.subtitles) {
+        foundSubtitles = movie.subtitles.map((s: any) => ({
+          language: s.language,
+          url: s.url,
+          label: s.label || (s.language === 'en' ? 'English' : 'Español')
+        }));
+      }
+
+      setSelectedMovie({ ...result, subtitles: foundSubtitles });
+
       if (foundUrl) {
         setVideoUrl(foundUrl);
         setShowVideoPlayer(true);
@@ -235,11 +266,14 @@ const MovieDetailPage: React.FC = () => {
     <div className="movie-detail">
       {showVideoPlayer && videoUrl && (
         <div className="movie-detail__video-modal-overlay">
-          <VideoPlayer
-            videoUrl={videoUrl}
-            title={movie.title}
-            onClose={handleCloseVideoPlayer}
-          />
+              <VideoPlayer
+                videoUrl={videoUrl}
+                title={movie.title}
+                onClose={handleCloseVideoPlayer}
+                subtitles={selectedMovie?.subtitles || []}
+                cloudinaryPublicId={selectedMovie?.public_id || selectedMovie?.publicId || movie.id}
+                cloudinaryCloudName={(selectedMovie && selectedMovie.cloudName) || 'dwmt0zy4j'}
+              />
         </div>
       )}
 
@@ -294,11 +328,6 @@ const MovieDetailPage: React.FC = () => {
                 <Heart size={18} color="#9ca3af" />
               )}
               <span>{isFavorite ? 'Quitar de favoritos' : 'Marcar como favorita'}</span>
-            </Button>
-
-            <Button variant="outline" size="medium" className="movie-detail__action-btn">
-              <SlidersHorizontal size={18} />
-              <span>Audio y subtítulos</span>
             </Button>
           </div>
 

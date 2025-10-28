@@ -18,7 +18,7 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(116, 20, 20, 0.1);
+    background: rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: #fff;
     padding: 10px 16px;
@@ -27,7 +27,7 @@
     transition: all 0.3s ease;
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgb(255, 255, 255);
       transform: translateY(-2px);
     }
   }

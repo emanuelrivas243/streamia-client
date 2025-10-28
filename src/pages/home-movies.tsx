@@ -3,7 +3,7 @@ import { Play, Heart, SlidersHorizontal, Star, Search } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
 import MovieCard from '../components/MovieCard';
-import VideoPlayer from '../components/VideoPlayer'; // ✅ Este SÍ funciona ahora
+import VideoPlayer from '../components/VideoPlayer';
 import { mockMovies } from '../data/mockMovies';
 import { favoritesAPI, apiUtils } from '../services/api';
 import './home-movies.scss';
@@ -17,6 +17,7 @@ const HomeMovies: React.FC = () => {
   const [favoritesIds, setFavoritesIds] = useState<Array<string | number>>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [filteredMovies, setFilteredMovies] = useState(mockMovies);
+  const [selectedMovie, setSelectedMovie] = useState<any | null>(null);
 
   // Filter movies based on search query
   useEffect(() => {
@@ -76,9 +77,10 @@ const HomeMovies: React.FC = () => {
   /**
    * Handle play button click - get video from backend
    */
-  const handlePlayMovie = async () => {
+  const handlePlayMovie = async (movie: any) => {
     setIsLoadingVideo(true);
     setVideoError(null);
+    setSelectedMovie(movie);
 
     try {
       await getData();
@@ -260,13 +262,13 @@ const HomeMovies: React.FC = () => {
         </div>
       </section>
 
-      {/* ✅ Video Player Modal - LIMPIO Y FUNCIONAL */}
-      {showVideoPlayer && videoUrl && (
+      {showVideoPlayer && videoUrl && selectedMovie && (
         <div className="home-movies__video-modal">
           <VideoPlayer
             videoUrl={videoUrl}
             title="Reproduciendo película"
             onClose={handleCloseVideoPlayer}
+            subtitles={selectedMovie.subtitles || []}
           />
         </div>
       )}

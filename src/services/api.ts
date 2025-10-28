@@ -454,6 +454,99 @@ export const favoritesAPI = {
 
 
 /**
+ * Ratings API functions for backend integration.
+ */
+export const ratingsAPI = {
+  /**
+   * Add or update a rating for a movie.
+   *
+   * @param token - Authentication token
+   * @param payload - Rating data: { movieId, rating }
+   * @returns ApiResponse
+   */
+  async addRating(
+    token: string,
+    payload: { movieId: string; rating: number }
+  ): Promise<ApiResponse> {
+    return makeRequest('/api/ratings', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    });
+  },
+
+  /**
+   * Get all ratings for the authenticated user.
+   *
+   * @param token - Authentication token
+   * @returns ApiResponse<any[]>
+   */
+  async getUserRatings(token: string): Promise<ApiResponse<any[]>> {
+    // Extract userId from token (assuming JWT format)
+    try {
+      const tokenPayload = JSON.parse(atob(token.split('.')[1]));
+      const userId = tokenPayload.id;
+      
+      return makeRequest<any[]>(`/api/ratings/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      console.error('Error extracting userId from token:', error);
+      return {
+        success: false,
+        error: 'Invalid token format',
+      };
+    }
+  },
+
+  /**
+   * Update an existing rating.
+   *
+   * @param token - Authentication token
+   * @param id - Rating ID
+   * @param rating - New rating value
+   * @returns ApiResponse
+   */
+  async updateRating(
+    token: string,
+    id: string,
+    rating: number
+  ): Promise<ApiResponse> {
+    return makeRequest(`/api/ratings/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ rating }),
+    });
+  },
+
+  /**
+   * Delete a rating.
+   *
+   * @param token - Authentication token
+   * @param id - Rating ID to delete
+   * @returns ApiResponse
+   */
+  async deleteRating(
+    token: string,
+    id: string
+  ): Promise<ApiResponse> {
+    return makeRequest(`/api/ratings/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+  },
+};
+
+/**
  * Utility functions for token management and simple auth helpers.
  */
 export const apiUtils = {

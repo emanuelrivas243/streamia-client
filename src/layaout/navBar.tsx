@@ -49,7 +49,7 @@ const NavBar: React.FC = () => {
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/homePage">Inicio</Link></li>
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/home-movies">Películas</Link></li>
             <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/Favorites">Favoritos</Link></li>
-            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="#">Mis calificaciones</Link></li>
+            <li className="navbar__menu-item" role="none"><Link role="menuitem" to="/ratings">Mis calificaciones</Link></li>
           </ul>
         )}
 

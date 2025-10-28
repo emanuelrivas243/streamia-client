@@ -16,6 +16,7 @@ import EditProfile from '../pages/editProfile';
 import Favorites from '../pages/favorites';
 import MovieDetailPage from '../pages/MovieDetailPage';
 import Manual from '../pages/manual';
+import Ratings from '../pages/ratings';
 
 /**
  * Public application routes configuration
@@ -37,6 +38,7 @@ const AppRouters: React.FC = () => {
       <Route path="/home-movies" element={<HomeMovies />} />
       <Route path="/edit-profile" element={<EditProfile />} />
       <Route path="/favorites" element={<Favorites />} />
+      <Route path="/ratings" element={<Ratings />} />
       <Route path="/movie/:id" element={<MovieDetailPage />} />
       <Route path="/" element={<HomePage />} />
       <Route path="/movies" element={<HomeMovies />} />

@@ -77,7 +77,7 @@ export const mockMovies: Movie[] = [
       {
         language: "es",
         label: "Español",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761506527/streamia/subtitles/Demon_Slayer_jiypse_es.vtt", // mal
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673455/Demon_Slayer_jiypse_es_pcj2nw.vtt", // bien
       },
       {
         language: "en",
@@ -126,7 +126,7 @@ export const mockMovies: Movie[] = [
       {
         language: "en",
         label: "English",
-        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761507284/streamia/subtitles/Weapons_fri1p3_en.vtt", // mal
+        url: "https://res.cloudinary.com/dwmt0zy4j/raw/upload/v1761673023/Weapons_fri1p3_en_erxtfx.vtt", // bien
       },
     ],
   },

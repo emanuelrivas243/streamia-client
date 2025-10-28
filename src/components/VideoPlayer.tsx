@@ -3,7 +3,7 @@
  * Supports play, pause, stop, and video source management
  */
 import React, { useRef, useState, useEffect } from 'react';
-import { Play, Pause, Square, Volume2, VolumeX, Maximize, Minimize } from 'lucide-react';
+import { Play, Pause, Square, Volume2, VolumeX, Maximize } from 'lucide-react';
 import './VideoPlayer.scss';
 
 /**
@@ -13,6 +13,23 @@ interface VideoPlayerProps {
   videoUrl: string;
   title: string;
   onClose: () => void;
+  subtitles?: Subtitle[];
+  /** Optional Cloudinary public id for using the Cloudinary player */
+  cloudinaryPublicId?: string;
+  /** Cloudinary cloud name (defaults to the project's cloud name) */
+  cloudinaryCloudName?: string;
+}
+
+interface Subtitle {
+  language: string;
+  url: string;
+  label: string;
+}
+
+declare global {
+  interface Window {
+    cloudinary: any;
+  }
 }
 
 /**
@@ -23,9 +40,15 @@ interface VideoPlayerProps {
 const VideoPlayer: React.FC<VideoPlayerProps> = ({
   videoUrl,
   title,
-  onClose
+  onClose,
+  subtitles = []
+  , cloudinaryPublicId, cloudinaryCloudName = 'dwmt0zy4j'
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cldContainerRef = useRef<HTMLDivElement>(null);
+  const cldPlayerRef = useRef<any>(null);
+  const cldContainerId = React.useMemo(() => `cld-player-${Date.now().toString(36)}-${Math.random().toString(36).slice(2,8)}`, []);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -34,6 +57,134 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedSubtitle, setSelectedSubtitle] = useState<string>('off');
+  const [showSubtitleMenu, setShowSubtitleMenu] = useState<boolean>(false);
+  // subtitle toggle - 'off' or language code
+
+
+  const applySubtitleSelection = (lang?: string) => {
+    const chosen = typeof lang === 'string' ? lang : selectedSubtitle;
+    const tracks = videoRef.current?.textTracks;
+    if (!tracks) return;
+    // hide all
+    for (const t of tracks) {
+      t.mode = 'hidden';
+    }
+
+    if (chosen && chosen !== 'off') {
+      for (const t of tracks) {
+        if (t.language === chosen) {
+          t.mode = 'showing';
+        }
+      }
+    }
+  };
+
+  // Initialize Cloudinary player when a cloudinaryPublicId is provided
+  useEffect(() => {
+    const cld = (globalThis as any).cloudinary;
+    if (!cloudinaryPublicId || !cld || !cldContainerRef.current) return;
+
+    // destroy previous instance if any
+    try {
+      if (cldPlayerRef.current && typeof cldPlayerRef.current.destroy === 'function') {
+        cldPlayerRef.current.destroy();
+      }
+    } catch (_) {}
+
+    // create a new Cloudinary player inside the container
+    try {
+      const options = {
+        cloudName: cloudinaryCloudName,
+        publicId: cloudinaryPublicId,
+        controls: true,
+        autoplay: true,
+        // subtitle profile and styling to ensure VTT subtitles are shown
+        profile: 'cid-default-sub',
+        subtitlesDefault: true,
+        subtitlesSize: 20,
+        subtitlesColor: 'white',
+      };
+
+      // library exposes a `player` factory
+      cldPlayerRef.current = cld.player(cldContainerRef.current.id || 'cld-player', options);
+      // try to play
+      if (cldPlayerRef.current && typeof cldPlayerRef.current.play === 'function') {
+        cldPlayerRef.current.play().catch(() => {});
+      }
+      setIsLoading(false);
+    } catch (err) {
+      // fallback to native video if Cloudinary player fails
+      // eslint-disable-next-line no-console
+      console.warn('Cloudinary player init failed:', err);
+    }
+
+    return () => {
+      try {
+        if (cldPlayerRef.current && typeof cldPlayerRef.current.destroy === 'function') {
+          cldPlayerRef.current.destroy();
+        }
+      } catch (_) {}
+    };
+  }, [cloudinaryPublicId, cloudinaryCloudName]);
+
+  /**
+   * Enter fullscreen automatically when component mounts
+   */
+  useEffect(() => {
+    const enterFullscreen = async () => {
+      if (containerRef.current) {
+        try {
+          await containerRef.current.requestFullscreen();
+          setIsFullscreen(true);
+        } catch (err) {
+          console.log('Error al entrar en pantalla completa:', err);
+        }
+      }
+    };
+
+    // Enter fullscreen after a short delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      enterFullscreen();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  /**
+   * Handle fullscreen change events
+   */
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullscreenChange);
+    };
+  }, []);
+
+  /**
+   * Handle escape key to close video when in fullscreen
+   */
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.code === 'Escape' && isFullscreen) {
+        onClose();
+      } else if (e.code === 'Space') {
+        e.preventDefault();
+        handlePlayPause();
+      } else if (e.code === 'KeyF') {
+        e.preventDefault();
+        handleFullscreenToggle();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    return () => document.removeEventListener('keydown', handleKeyPress);
+  }, [isPlaying, isFullscreen]);
 
   /**
    * Handle play/pause toggle
@@ -67,6 +218,23 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     if (videoRef.current) {
       videoRef.current.muted = !isMuted;
       setIsMuted(!isMuted);
+    }
+  };
+
+  /**
+   * Handle fullscreen toggle
+   */
+  const handleFullscreenToggle = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+        setIsFullscreen(false);
+      } else {
+        await containerRef.current?.requestFullscreen();
+        setIsFullscreen(true);
+      }
+    } catch (err) {
+      console.log('Error al cambiar pantalla completa:', err);
     }
   };
 
@@ -122,7 +290,28 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
   const handleCanPlay = () => {
     setIsLoading(false);
     setHasError(false);
+    applySubtitleSelection();
   };
+
+  // When user changes selectedSubtitle, apply selection to tracks
+  useEffect(() => {
+    applySubtitleSelection();
+  }, [selectedSubtitle]);
+
+  // Close subtitle menu when clicking outside
+  useEffect(() => {
+    if (!showSubtitleMenu) return;
+    const onDocClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (!target) return;
+      const wrap = containerRef.current?.querySelector('.video-player__subtitle-toggle-wrap');
+      if (wrap && target instanceof Node && !wrap.contains(target)) {
+        setShowSubtitleMenu(false);
+      }
+    };
+    document.addEventListener('click', onDocClick);
+    return () => document.removeEventListener('click', onDocClick);
+  }, [showSubtitleMenu]);
 
   /**
    * Handle video error
@@ -131,6 +320,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setIsLoading(false);
     setHasError(true);
     setErrorMessage('Error al cargar el video. Verifica tu conexión a internet.');
+  };
+
+  const handleClose = () => {
+    try {
+      if (cldPlayerRef.current && typeof cldPlayerRef.current.destroy === 'function') {
+        cldPlayerRef.current.destroy();
+      }
+    } catch (_) {}
+    onClose();
   };
 
   /**
@@ -159,45 +357,51 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
     setShowControls(false);
   };
 
-  /**
-   * Handle keyboard shortcuts
-   */
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.code === 'Space') {
-        e.preventDefault();
-        handlePlayPause();
-      } else if (e.code === 'Escape') {
-        onClose();
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyPress);
-    return () => document.removeEventListener('keydown', handleKeyPress);
-  }, [isPlaying]);
-
   return (
     <div 
+      ref={containerRef}
       className="video-player"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
     >
       {/* Video Element */}
-      <video
-        ref={videoRef}
-        className="video-player__video"
-        src={videoUrl}
-        onTimeUpdate={handleTimeUpdate}
-        onDurationChange={handleDurationChange}
-        onLoadStart={handleLoadStart}
-        onCanPlay={handleCanPlay}
-        onError={handleError}
-        onPlay={() => setIsPlaying(true)}
-        onPause={() => setIsPlaying(false)}
-        onEnded={() => setIsPlaying(false)}
-        preload="metadata"
-        aria-label={`Reproduciendo ${title}`}
-      />
+    <video
+      ref={videoRef}
+      className="video-player__video"
+      src={videoUrl}
+      onTimeUpdate={handleTimeUpdate}
+      onDurationChange={handleDurationChange}
+      onLoadStart={handleLoadStart}
+      onCanPlay={handleCanPlay}
+      onError={handleError}
+      onPlay={() => setIsPlaying(true)}
+      onPause={() => setIsPlaying(false)}
+      onEnded={() => setIsPlaying(false)}
+      preload="metadata"
+      autoPlay
+      aria-label={`Reproduciendo ${title}`}
+      crossOrigin="anonymous"
+      controlsList="nodownload"
+    >
+      {/* 👇 Aquí se agregan los subtítulos dinámicos */}
+      {subtitles?.map((sub) => (
+        <track
+          key={sub.language}
+          src={sub.url}
+          label={sub.label}
+          kind="subtitles"
+          srcLang={sub.language}
+        />
+      ))}
+    </video>
+        {/* Cloudinary player container (Cloudinary player will render here when cloudinaryPublicId is provided) */}
+        <div
+          id={cldContainerId}
+          ref={cldContainerRef}
+          className="cld-player-container"
+          aria-label={`Reproductor de ${title}`}
+        />
+
 
       {/* Loading indicator */}
       {isLoading && (
@@ -227,7 +431,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           </button>
           <button 
             className="video-player__close-error-btn"
-            onClick={onClose}
+            onClick={handleClose}
           >
             Cerrar
           </button>
@@ -241,14 +445,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
           <h3 className="video-player__title">{title}</h3>
           <button 
             className="video-player__close-btn"
-            onClick={onClose}
+            onClick={handleClose}
             aria-label="Cerrar reproductor"
           >
             ✕
           </button>
         </div>
-
-        {/* Center play button */}
         <div className="video-player__center-controls">
           <button
             className="video-player__play-btn"
@@ -300,6 +502,75 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({
                 aria-label={isMuted ? 'Activar sonido' : 'Silenciar'}
               >
                 {isMuted ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </button>
+
+              {/* Subtitle toggle button */}
+              {subtitles && subtitles.length > 0 && (
+                <div className="video-player__subtitle-toggle-wrap">
+                  <button
+                    className={`video-player__control-btn video-player__subtitle-btn ${selectedSubtitle !== 'off' ? 'is-active' : ''}`}
+                    aria-haspopup="menu"
+                    aria-expanded={showSubtitleMenu}
+                    aria-label={selectedSubtitle !== 'off' ? 'Subtítulos activados' : 'Subtítulos desactivados'}
+                    onClick={() => setShowSubtitleMenu((s) => !s)}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden>
+                      <rect x="2" y="5" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.5" />
+                      <rect x="5" y="8" width="6" height="1.4" fill="currentColor" />
+                      <rect x="5" y="11" width="10" height="1.4" fill="currentColor" />
+                      <rect x="5" y="14" width="6" height="1.4" fill="currentColor" />
+                    </svg>
+                  </button>
+
+                  {showSubtitleMenu && (
+                    <div className="video-player__subtitle-popover" role="menu" aria-label="Seleccionar subtítulos">
+                      <button
+                        type="button"
+                        role="menuitem"
+                        className={`video-player__subtitle-item ${selectedSubtitle === 'off' ? 'is-active' : ''}`}
+                        onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                          e.stopPropagation();
+                          setSelectedSubtitle('off');
+                          setShowSubtitleMenu(false);
+                          // apply immediately using the explicit language param
+                          applySubtitleSelection('off');
+                          try { if (cldPlayerRef.current && typeof cldPlayerRef.current.setSubtitlesEnabled === 'function') cldPlayerRef.current.setSubtitlesEnabled(false); } catch (e) { console.warn('Cloudinary subtitle off failed', e); }
+                        }}
+                      >
+                        Off
+                      </button>
+                      {subtitles.map((s) => (
+                        <button
+                          key={s.language}
+                          type="button"
+                          role="menuitem"
+                          className={`video-player__subtitle-item ${selectedSubtitle === s.language ? 'is-active' : ''}`}
+                          onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
+                            e.stopPropagation();
+                            setSelectedSubtitle(s.language);
+                            setShowSubtitleMenu(false);
+                            applySubtitleSelection(s.language);
+                            try {
+                              if (cldPlayerRef.current && typeof cldPlayerRef.current.setSubtitlesEnabled === 'function') cldPlayerRef.current.setSubtitlesEnabled(true);
+                              if (cldPlayerRef.current && typeof cldPlayerRef.current.setSubtitlesLanguage === 'function') cldPlayerRef.current.setSubtitlesLanguage(s.language);
+                            } catch (e) { console.warn('Cloudinary subtitle change failed', e); }
+                          }}
+                        >
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Fullscreen button */}
+              <button
+                className="video-player__control-btn video-player__fullscreen-btn"
+                onClick={handleFullscreenToggle}
+                aria-label={isFullscreen ? 'Salir de pantalla completa' : 'Pantalla completa'}
+              >
+                <Maximize size={20} />
               </button>
             </div>
 

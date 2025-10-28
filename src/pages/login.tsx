@@ -132,7 +132,9 @@ export default function Login() {
               <div className="input-group">
                 <div className="input-container">
                   <Mail className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="login-email">Correo electrónico</label>
                   <input
+                    id="login-email"
                     type="email"
                     placeholder="Correo electrónico"
                     value={email}
@@ -154,7 +156,9 @@ export default function Login() {
               <div className="input-group">
                 <div className="input-container has-toggle">
                   <Lock className="input-icon" size={20} />
+                  <label className="sr-only" htmlFor="login-password">Contraseña</label>
                   <input
+                    id="login-password"
                     type={showPassword ? "text" : "password"}
                     placeholder="Contraseña"
                     value={password}

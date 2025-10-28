@@ -8,6 +8,7 @@ export const ROUTES = {
   HOME: '/',
   ABOUT: '/about',
   CONTACT: '/contact',
+  MANUAL: '/manual',
   SITEMAP: '/sitemap',
   LOGIN: '/login',
   REGISTER: '/register',
@@ -16,6 +17,7 @@ export const ROUTES = {
   
   // Protected Routes
   EDIT_PROFILE: '/edit-profile',
+  RATINGS: '/ratings',
   
   // Future routes can be added here
   // DASHBOARD: '/dashboard',
